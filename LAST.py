@@ -177,7 +177,9 @@ def main():
             print("Usage for full scan: python LAST.py.py partial <directory>")
             sys.exit(1)
         directory = sys.argv[2]
-        print(partial_scan(directory))
+        base_ref = sys.argv[3]
+        head_ref = sys.argv[4]
+        print(partial_scan(directory, base_ref, head_ref))
 
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
