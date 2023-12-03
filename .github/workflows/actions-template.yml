@@ -8,9 +8,14 @@ jobs:
   LAST-Scan:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+
+    - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # Fetch all history for all branches and tags
+        ref: ${{ github.head_ref }}
+    
+    - name: Fetch target branch
+      run: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
 
     - uses: actions/checkout@v4
       with:
@@ -31,5 +36,6 @@ jobs:
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python LAST/LAST.py partial .
+      run: |
+        python LAST/LAST.py partial-github . ${{ github.base_ref }} ${{ github.head_ref }}
 
