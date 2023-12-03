@@ -10,19 +10,19 @@ githubkey = os.environ.get('GITHUB_TOKEN')
 
 client = OpenAI(api_key=openaikey)
 
-def get_changed_files(directory):
+def get_changed_files(directory, base_ref, head_ref):
     """
-    Returns a list of files that have been changed locally.
+    Returns a list of files that have been changed in the pull request.
     """
     changed_files = []
     try:
         os.chdir(directory)
-        result = subprocess.check_output(["git", "diff", "--name-only"], text=True)
+        result = subprocess.check_output(["git", "diff", "--name-only", f"{base_ref}...{head_ref}"], text=True)
         changed_files = result.strip().split('\n')
-        print(result)
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
+
 
 def get_line_changes(directory):
     """
