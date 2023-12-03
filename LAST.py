@@ -141,6 +141,8 @@ def partial_scan(directory):
     else:
         return "No changed files to scan."
 
+insecure change
+
 def main():
     """
     Main function to perform full or partial security scanning.
