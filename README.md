@@ -11,4 +11,4 @@ Just using OpenAI to scan your files because it does a better job than most of t
 # Future Improvements
 1. For full directory scans, calculate number of tokens in advanced and split up the files
 2. Same for Partial Scans
-3. Finish Dockerfile and github scan option to allow running in pipeline as a GitHub action
+3. Finish Dockerfile for more elegant pipeline scanning

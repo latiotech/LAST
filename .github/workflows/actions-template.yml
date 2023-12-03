@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        path: main
 
     - uses: actions/checkout@v4
       with:
@@ -31,4 +29,4 @@ jobs:
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python LAST/LAST.py partial main/${{ github.repository }}
+      run: python LAST/LAST.py partial ${{ github.workspace }}

@@ -123,17 +123,21 @@ def partial_scan(directory):
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
     for file_path in changed_files:
-        try:
-            with open(file_path, 'r') as f:
-                changes_summary += f"\nFile: {file_path}\n"
-                changes_summary += f.read()
-        except UnicodeDecodeError:
+        if file_path:
             try:
-                with open(file_path, 'r', encoding='latin-1') as f:
+                with open(file_path, 'r') as f:
                     changes_summary += f"\nFile: {file_path}\n"
                     changes_summary += f.read()
-            except Exception as e:
-                print(f"Error reading {file_path}: {e}")
+            except UnicodeDecodeError:
+                try:
+                    with open(file_path, 'r', encoding='latin-1') as f:
+                        changes_summary += f"\nFile: {file_path}\n"
+                        changes_summary += f.read()
+                except Exception as e:
+                    print(f"Error reading {file_path}: {e}")
+        else:
+            print("No changed files to scan.")
+            return
 
     if changes_summary:
         result = partial_sec_scan(changes_summary)
