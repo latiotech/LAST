@@ -12,25 +12,39 @@ client = OpenAI(api_key=openaikey)
 
 def get_changed_files_github(directory, base_ref, head_ref):
     """
-    Returns a list of files that have been changed in the pull request.
+    Returns a list of files that have been changed in the pull request, excluding deleted files.
     """
     changed_files = []
     try:
-          os.chdir(directory)
-          result = subprocess.check_output(["git", "diff", "--name-only", f"{base_ref}...{head_ref}"], text=True)
-          changed_files = result.strip().split('\n')
-    except subprocess.CalledProcessError as e:
-          print(f"Error getting changed files: {e}")
-    return changed_files
-
-def get_changed_files(directory):
-    try:
         os.chdir(directory)
-        result = subprocess.check_output(["git", "diff", "--name-only"], text=True)
-        changed_files = result.strip().split('\n')
+        result = subprocess.check_output(["git", "diff", "--name-status", f"{base_ref}...{head_ref}"], text=True)
+        lines = result.strip().split('\n')
+        for line in lines:
+            status, file_path = line.split(maxsplit=1)
+            if status != 'D':  # Exclude deleted files
+                changed_files.append(file_path)
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
+
+
+def get_changed_files(directory):
+    """
+    Returns a list of files that have been changed in the pull request, excluding deleted files.
+    """
+    changed_files = []
+    try:
+        os.chdir(directory)
+        result = subprocess.check_output(["git", "diff", "--name-status"], text=True)
+        lines = result.strip().split('\n')
+        for line in lines:
+            status, file_path = line.split(maxsplit=1)
+            if status != 'D':  # Exclude deleted files
+                changed_files.append(file_path)
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting changed files: {e}")
+    return changed_files
+
 
 def get_line_changes_github(directory, base_ref, head_ref):
     """
