@@ -10,24 +10,26 @@ githubkey = os.environ.get('GITHUB_TOKEN')
 
 client = OpenAI(api_key=openaikey)
 
-def get_changed_files():
+def get_changed_files(directory):
     """
     Returns a list of files that have been changed locally.
     """
     changed_files = []
     try:
+        os.chdir(directory)
         result = subprocess.check_output(["git", "diff", "--name-only"], text=True)
         changed_files = result.strip().split('\n')
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
 
-def get_line_changes():
+def get_line_changes(directory):
     """
     Returns a string containing line changes from the latest commit.
     """
     line_changes = ""
     try:
+        os.chdir(directory)
         # Getting line changes for the last commit
         result = subprocess.check_output(["git", "diff", "HEAD~1", "HEAD"], text=True)
         line_changes = result.strip()
@@ -112,12 +114,12 @@ def github_scan(repo_name, pr_number, github_token):
     result = partial_sec_scan(changes_summary)
     return result
 
-def partial_scan():
+def partial_scan(directory):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
-    changed_files = get_changed_files()
-    line_changes = get_line_changes()
+    changed_files = get_changed_files(directory)
+    line_changes = get_line_changes(directory)
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
     for file_path in changed_files:
@@ -166,7 +168,11 @@ def main():
         print(github_scan(repo_name, pr_number, github_token))
 
     elif mode == 'partial':
-        print(partial_scan())
+        if len(sys.argv) < 3:
+            print("Usage for full scan: python LAST.py.py partial <directory>")
+            sys.exit(1)
+        directory = sys.argv[2]
+        print(partial_scan(directory))
 
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
