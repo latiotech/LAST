@@ -1,5 +1,5 @@
-# LAST
-Latio Application Security Tester
+# Latio Application Security Tester
+Just using OpenAI to scan your files because it does a better job than most of the paid ones
 
 # How to Run it
 
