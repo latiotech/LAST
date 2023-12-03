@@ -5,17 +5,19 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  LAST-Scan:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.ref }}
         repository: ${{ github.event.pull_request.head.repo.full_name }}
+        path: main
 
     - uses: actions/checkout@v4
       with:
         repository: latiotech/LAST
+        path: LAST
         ref: main
 
     - name: Set up Python 3.12
@@ -31,4 +33,4 @@ jobs:
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python ./LAST/LAST.py partial .
+      run: python LAST/LAST.py partial main/
