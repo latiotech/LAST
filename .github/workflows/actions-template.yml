@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - uses: actions/checkout@v4
       with:
@@ -25,8 +27,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r LAST/requirements.txt
-
+    
+    - name: where
+      run: pwd
+    
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python LAST/LAST.py partial ${{ github.workspace }}
+      run: python LAST/LAST.py partial .
+
