@@ -175,6 +175,14 @@ def partial_scan_github(directory, base_ref, head_ref):
         else:
             print("No changed files to scan.")
             return
+        if changes_summary:
+            result = partial_sec_scan(changes_summary)
+            return result
+        else:
+            return "No changed files to scan."
+        return result
+    else:
+        return "No changed files to scan."
 
 def partial_scan(directory):
     """
