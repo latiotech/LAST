@@ -233,7 +233,7 @@ def main():
         directory = sys.argv[2]
         base_ref = sys.argv[3]
         head_ref = sys.argv[4]
-        print(partial_scan(directory, base_ref, head_ref))
+        print(partial_scan_github(directory, base_ref, head_ref))
 
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
