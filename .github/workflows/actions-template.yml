@@ -2,7 +2,8 @@ name: LAST
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
+    branches: [main, master]
 
 jobs:
   LAST-Scan:
@@ -10,8 +11,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.pull_request.head.ref }}
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
         path: main
 
     - uses: actions/checkout@v4
