@@ -2,7 +2,7 @@ name: LAST
 
 on:
   pull_request:
-    branches: [ master ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       with:
         repository: latiotech/LAST
         ref: main
-        
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
