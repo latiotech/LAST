@@ -20,3 +20,4 @@ This will run OpenAI in pipeline against only your changed files
 1. For full directory scans, calculate number of tokens in advanced and split up the files
 2. Same for Partial Scans
 3. Finish Dockerfile for more elegant pipeline scanning
+4. Make export data in more common format
