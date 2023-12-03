@@ -10,19 +10,41 @@ githubkey = os.environ.get('GITHUB_TOKEN')
 
 client = OpenAI(api_key=openaikey)
 
-def get_changed_files(directory, base_ref, head_ref):
+def get_changed_files_github(directory, base_ref, head_ref):
     """
     Returns a list of files that have been changed in the pull request.
     """
     changed_files = []
     try:
+          os.chdir(directory)
+          result = subprocess.check_output(["git", "diff", "--name-only", f"{base_ref}...{head_ref}"], text=True)
+          changed_files = result.strip().split('\n')
+    except subprocess.CalledProcessError as e:
+          print(f"Error getting changed files: {e}")
+    return changed_files
+
+def get_changed_files(directory):
+    try:
         os.chdir(directory)
-        result = subprocess.check_output(["git", "diff", "--name-only", f"{base_ref}...{head_ref}"], text=True)
+        result = subprocess.check_output(["git", "diff", "--name-only"], text=True)
         changed_files = result.strip().split('\n')
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
 
+def get_line_changes_github(directory, base_ref, head_ref):
+    """
+    Returns a string containing line changes between the base and head branches of a pull request.
+    """
+    line_changes = ""
+    try:
+        os.chdir(directory)
+        # Getting line changes between the base and head branches of the PR
+        result = subprocess.check_output(["git", "diff", f"{base_ref}...{head_ref}"], text=True)
+        line_changes = result.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting line changes: {e}")
+    return line_changes
 
 def get_line_changes(directory):
     """
@@ -115,6 +137,31 @@ def github_scan(repo_name, pr_number, github_token):
     result = partial_sec_scan(changes_summary)
     return result
 
+def partial_scan_github(directory, base_ref, head_ref):
+    """
+    Scans files changed locally and includes detailed line changes for security issues.
+    """
+    changed_files = get_changed_files_github(directory, base_ref, head_ref)
+    line_changes = get_line_changes_github(directory, base_ref, head_ref)
+    changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
+
+    for file_path in changed_files:
+        if file_path:
+            try:
+                with open(file_path, 'r') as f:
+                    changes_summary += f"\nFile: {file_path}\n"
+                    changes_summary += f.read()
+            except UnicodeDecodeError:
+                try:
+                    with open(file_path, 'r', encoding='latin-1') as f:
+                        changes_summary += f"\nFile: {file_path}\n"
+                        changes_summary += f.read()
+                except Exception as e:
+                    print(f"Error reading {file_path}: {e}")
+        else:
+            print("No changed files to scan.")
+            return
+
 def partial_scan(directory):
     """
     Scans files changed locally and includes detailed line changes for security issues.
@@ -173,6 +220,13 @@ def main():
         print(github_scan(repo_name, pr_number, github_token))
 
     elif mode == 'partial':
+        if len(sys.argv) < 3:
+            print("Usage for full scan: python LAST.py.py partial <directory>")
+            sys.exit(1)
+        directory = sys.argv[2]
+        print(partial_scan(directory))
+
+    elif mode == 'partial-github':
         if len(sys.argv) < 3:
             print("Usage for full scan: python LAST.py.py partial <directory>")
             sys.exit(1)
