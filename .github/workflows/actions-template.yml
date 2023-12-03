@@ -31,4 +31,4 @@ jobs:
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python LAST.py partial .
+      run: python ./LAST/LAST.py partial .
