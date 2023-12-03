@@ -47,7 +47,7 @@ def full_sec_scan(application_summary):
                 {"role": "user", "content": application_summary}
             ]
         )
-        message = response.choices[0].message['content']
+        message = response.choices[0].message.content
         return message
     except Exception as e:
         return f"Error occurred: {e}"
@@ -86,7 +86,7 @@ def partial_sec_scan(application_summary):
                 {"role": "user", "content": application_summary}
             ]
         )
-        message = response.choices[0].message['content']
+        message = response.choices[0].message.content
         return message
     except Exception as e:
         return f"Error occurred: {e}"
@@ -146,8 +146,6 @@ def main():
     """
     Main function to perform full or partial security scanning.
     """
-    
-
     if len(sys.argv) < 2:
         print("Usage: python security_scanner.py <mode> [<directory>|<repo_name pr_number>]")
         sys.exit(1)
