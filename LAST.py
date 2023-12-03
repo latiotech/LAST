@@ -22,6 +22,19 @@ def get_changed_files():
         print(f"Error getting changed files: {e}")
     return changed_files
 
+def get_line_changes():
+    """
+    Returns a string containing line changes from the latest commit.
+    """
+    line_changes = ""
+    try:
+        # Getting line changes for the last commit
+        result = subprocess.check_output(["git", "diff", "HEAD~1", "HEAD"], text=True)
+        line_changes = result.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting line changes: {e}")
+    return line_changes
+
 def full_sec_scan(application_summary):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
@@ -101,29 +114,32 @@ def github_scan(repo_name, pr_number, github_token):
 
 def partial_scan():
     """
-    Scans files changed locally for security issues.
+    Scans files changed locally and includes detailed line changes for security issues.
     """
     changed_files = get_changed_files()
-    changes_summary = ""
+    line_changes = get_line_changes()
+    changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
     for file_path in changed_files:
-        try:
-            with open(file_path, 'r') as f:
-                changes_summary += f"\n\nFile: {file_path}\n"
-                changes_summary += f.read()
-        except UnicodeDecodeError:
+        if file_path.endswith('.py'):  # Assuming Python files, change as needed
             try:
-                with open(file_path, 'r', encoding='latin-1') as f:
-                    changes_summary += f"\n\nFile: {file_path}\n"
+                with open(file_path, 'r') as f:
+                    changes_summary += f"\nFile: {file_path}\n"
                     changes_summary += f.read()
-            except Exception as e:
-                print(f"Error reading {file_path}: {e}")
+            except UnicodeDecodeError:
+                try:
+                    with open(file_path, 'r', encoding='latin-1') as f:
+                        changes_summary += f"\nFile: {file_path}\n"
+                        changes_summary += f.read()
+                except Exception as e:
+                    print(f"Error reading {file_path}: {e}")
 
     if changes_summary:
         result = partial_sec_scan(changes_summary)
         return result
     else:
         return "No changed Python files to scan."
+
 
 
 def main():
