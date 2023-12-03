@@ -3,7 +3,6 @@ name: LAST
 on:
   pull_request:
     types: [opened]
-    branches: [main, master]
 
 jobs:
   LAST-Scan:
