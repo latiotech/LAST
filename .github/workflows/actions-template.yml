@@ -28,9 +28,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r LAST/requirements.txt
     
-    - name: where
-      run: pwd
-    
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

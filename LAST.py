@@ -19,6 +19,7 @@ def get_changed_files(directory):
         os.chdir(directory)
         result = subprocess.check_output(["git", "diff", "--name-only"], text=True)
         changed_files = result.strip().split('\n')
+        print(result)
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
