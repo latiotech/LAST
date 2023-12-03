@@ -121,47 +121,44 @@ def partial_scan():
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
     for file_path in changed_files:
-        if file_path.endswith('.py'):  # Assuming Python files, change as needed
+        try:
+            with open(file_path, 'r') as f:
+                changes_summary += f"\nFile: {file_path}\n"
+                changes_summary += f.read()
+        except UnicodeDecodeError:
             try:
-                with open(file_path, 'r') as f:
+                with open(file_path, 'r', encoding='latin-1') as f:
                     changes_summary += f"\nFile: {file_path}\n"
                     changes_summary += f.read()
-            except UnicodeDecodeError:
-                try:
-                    with open(file_path, 'r', encoding='latin-1') as f:
-                        changes_summary += f"\nFile: {file_path}\n"
-                        changes_summary += f.read()
-                except Exception as e:
-                    print(f"Error reading {file_path}: {e}")
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}")
 
     if changes_summary:
         result = partial_sec_scan(changes_summary)
         return result
     else:
-        return "No changed Python files to scan."
-
-
+        return "No changed files to scan."
 
 def main():
     """
     Main function to perform full or partial security scanning.
     """
     if len(sys.argv) < 2:
-        print("Usage: python security_scanner.py <mode> [<directory>|<repo_name pr_number>]")
+        print("Usage: python LAST.py.py <mode> [<directory>|<repo_name pr_number>]")
         sys.exit(1)
 
     mode = sys.argv[1]
 
     if mode == 'full':
         if len(sys.argv) < 3:
-            print("Usage for full scan: python security_scanner.py full <directory>")
+            print("Usage for full scan: python LAST.py.py full <directory>")
             sys.exit(1)
         directory = sys.argv[2]
         print(full_scan(directory))
 
     elif mode == 'github':
         if len(sys.argv) < 4:
-            print("Usage for partial scan: python security_scanner.py partial <repo_name> <pr_number>")
+            print("Usage for partial scan: python LAST.py.py partial <repo_name> <pr_number>")
             sys.exit(1)
         repo_name = sys.argv[2]
         pr_number = int(sys.argv[3])
