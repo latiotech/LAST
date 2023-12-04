@@ -1,5 +1,14 @@
 # Latio Application Security Tester
-Just using OpenAI to scan your files because it does a better job than most of the paid ones
+Just using OpenAI to scan your files because it does a better job than most of the paid ones. 
+
+In marketing terms:
+LAST is the worlds first end to end AI application scanning solution, covering:
+
+1. ASPM
+2. SAST
+3. IaC
+4. Container
+5. SDLC 
 
 # How to Run Locally
 
