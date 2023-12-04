@@ -68,7 +68,7 @@ def get_line_changes(directory):
     try:
         os.chdir(directory)
         # Getting line changes for the last commit
-        result = subprocess.check_output(["git", "diff", "HEAD~1", "HEAD"], text=True)
+        result = subprocess.check_output(["git", "diff", "HEAD", "HEAD~1"], text=True)
         line_changes = result.strip()
     except subprocess.CalledProcessError as e:
         print(f"Error getting line changes: {e}")
@@ -82,7 +82,7 @@ def full_sec_scan(application_summary):
         response = client.chat.completions.create(
             model="gpt-4-1106-preview",  # Choose the appropriate engine
             messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the code for the application, or just the changed code. Your task is to review the code for security vulnerabilities and suggest improvements."},
+                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements."},
                 {"role": "user", "content": application_summary}
             ]
         )
@@ -121,7 +121,7 @@ def partial_sec_scan(application_summary):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-1106",  # Choose the appropriate engine
             messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive just the changed code and need to make assumptions about the rest of the application. Your task is to review the code for security vulnerabilities and suggest improvements."},
+                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed."},
                 {"role": "user", "content": application_summary}
             ]
         )
