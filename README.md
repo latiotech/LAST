@@ -1,8 +1,14 @@
 # Latio Application Security Tester
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
-Example input: [Insecure Deployments Repo](https://github.com/latiotech/insecure-kubernetes-deployments) `python LAST.py full ~/git/insecure-kubernetes-deployments/`
-Example output:
+##Example input: 
+
+`python LAST.py full ~/git/insecure-kubernetes-deployments/` on [Insecure Deployments Repo](https://github.com/latiotech/insecure-kubernetes-deployments) 
+
+##Example output:
+
+In my experience, this is better and more actionable data than most security scanners
+
 ```
 ## Security Review Summary
 
