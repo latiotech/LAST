@@ -1,15 +1,28 @@
 # Latio Application Security Tester
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
-## Example input: 
+[View Examples](#full-scan-example)
+
+# How to Run Locally
+
+1. Get your OpenAI key from [here](https://platform.openai.com/api-keys)
+2. `export OPENAI_API_KEY=<OpenAPI Key>`
+3. Scan only your changed files before merging with `python LAST.py partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
+4. Scan your full application with `python LAST.py full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
+
+# How to Run in Pipeline
+
+This will run OpenAI in pipeline against only your changed files. [Here's an example](https://github.com/latiotech/insecure-kubernetes-deployments/actions/runs/7081197080/job/19270126283?pr=6) of what it looks like, it uses GPT-3.5 to scan only changed files, so it's relatively cheap.
+
+1. Get your OpenAI token from [here](https://platform.openai.com/api-keys)
+2. In your repository, go to `github.com/org/repo/settings/secrets/actions` and add a new Repository Secret called `OPENAI_API_KEY` with the value from OpenAI
+3. Copy and paste the `.github/workflows/actions-template.yml` into your own `.github/workflows/` folder
+
+
+# Full Scan Example
 
 `python LAST.py full ~/git/insecure-kubernetes-deployments/` on [Insecure Deployments Repo](https://github.com/latiotech/insecure-kubernetes-deployments) 
 
-## Example output:
-
-In my experience, this is better and more actionable data than most security scanners
-
-```
 ## Security Review Summary
 
 ### Environment File Exposure
@@ -57,12 +70,9 @@ The `publish-insecure.yml` file for GitHub Actions details automated Docker imag
 - Use Git hooks effectively for security but ensure their scripts enforce the intended security policies.
 - Continuously monitor and audit CI/CD workflows to ensure they are secure and can't be exploited.
 
-```
+# Partial Scan Example:
 
-## Partial Scan Example:
-
-```
-python LAST.py partial ~/git/insecure-kubernetes-deployments/
+`python LAST.py partial ~/git/insecure-kubernetes-deployments/``
 
 The line changes involve the removal of the code related to handling the 'printenv' request, specifically the code that retrieves and displays environment variables in the web interface.
 
@@ -73,31 +83,7 @@ Additionally, it's important to note that the code should be thoroughly reviewed
 To mitigate command injection vulnerabilities, it's recommended to validate and sanitize user inputs before passing them to subprocess.Popen or switch to using a safer alternative like subprocess.run with the correct arguments.
 
 The code changes regarding the removal of the 'printenv' functionality are sufficient from a security perspective, but a thorough review and potential improvements to input validation and subprocess usage are recommended to ensure the overall security of the application.
-```
 
-In marketing terms:
-LAST is the worlds first end to end AI application scanning solution, covering:
-
-1. ASPM
-2. SAST
-3. IaC
-4. Container
-5. SDLC 
-
-# How to Run Locally
-
-1. Get your OpenAI key from [here](https://platform.openai.com/api-keys)
-2. `export OPENAI_API_KEY=<OpenAPI Key>`
-3. Scan only your changed files before merging with `python LAST.py partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
-4. Scan your full application with `python LAST.py full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
-
-# How to Run in Pipeline
-
-This will run OpenAI in pipeline against only your changed files. [Here's an example](https://github.com/latiotech/insecure-kubernetes-deployments/actions/runs/7081197080/job/19270126283?pr=6) of what it looks like, it uses GPT-3.5 to scan only changed files, so it's relatively cheap.
-
-1. Get your OpenAI token from [here](https://platform.openai.com/api-keys)
-2. In your repository, go to `github.com/org/repo/settings/secrets/actions` and add a new Repository Secret called `OPENAI_API_KEY` with the value from OpenAI
-3. Copy and paste the `.github/workflows/actions-template.yml` into your own `.github/workflows/` folder
 
 # Future Improvements
 1. Probably just make this a pip package
