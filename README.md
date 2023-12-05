@@ -59,6 +59,22 @@ The `publish-insecure.yml` file for GitHub Actions details automated Docker imag
 
 ```
 
+## Partial Scan Example:
+
+```
+python LAST.py partial ~/git/insecure-kubernetes-deployments/
+
+The line changes involve the removal of the code related to handling the 'printenv' request, specifically the code that retrieves and displays environment variables in the web interface.
+
+The removal of the code related to displaying environment variables is a good decision from a security standpoint. Exposing environment variables in a web interface can lead to unintended information disclosure, providing potential attackers with insights into the server's configuration and sensitive information.
+
+Additionally, it's important to note that the code should be thoroughly reviewed to ensure that it securely handles user input, particularly the 'command' input, to prevent command injection vulnerabilities. The existing code uses subprocess.Popen with shell=True, which can be vulnerable to command injection if not handled carefully.
+
+To mitigate command injection vulnerabilities, it's recommended to validate and sanitize user inputs before passing them to subprocess.Popen or switch to using a safer alternative like subprocess.run with the correct arguments.
+
+The code changes regarding the removal of the 'printenv' functionality are sufficient from a security perspective, but a thorough review and potential improvements to input validation and subprocess usage are recommended to ensure the overall security of the application.
+```
+
 In marketing terms:
 LAST is the worlds first end to end AI application scanning solution, covering:
 
