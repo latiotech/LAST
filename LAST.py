@@ -82,7 +82,7 @@ def full_sec_scan(application_summary):
         response = client.chat.completions.create(
             model="gpt-4-1106-preview",  # Choose the appropriate engine
             messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements."},
+                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing."},
                 {"role": "user", "content": application_summary}
             ]
         )
@@ -121,7 +121,7 @@ def partial_sec_scan(application_summary):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-1106",  # Choose the appropriate engine
             messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed."},
+                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed. Suggest specific code fixes where applicable."},
                 {"role": "user", "content": application_summary}
             ]
         )
