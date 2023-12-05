@@ -88,7 +88,7 @@ The `publish-insecure.yml` file for GitHub Actions details automated Docker imag
 
 # Partial Scan Example:
 
-`python LAST.py partial ~/git/insecure-kubernetes-deployments/``
+`python LAST.py partial ~/git/insecure-kubernetes-deployments/`
 
 The line changes involve the removal of the code related to handling the 'printenv' request, specifically the code that retrieves and displays environment variables in the web interface.
 
