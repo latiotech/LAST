@@ -1,7 +1,24 @@
 # Latio Application Security Tester
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
-[View Examples](#full-scan-example)
+- [Latio Application Security Tester](#latio-application-security-tester)
+- [How to Run Locally](#how-to-run-locally)
+- [How to Run in Pipeline](#how-to-run-in-pipeline)
+- [Full Scan Example](#full-scan-example)
+   * [Security Review Summary](#security-review-summary)
+      + [Environment File Exposure](#environment-file-exposure)
+      + [CODEOWNERS Utilization](#codeowners-utilization)
+      + [Kubernetes Deployment Configurations](#kubernetes-deployment-configurations)
+      + [Python Script for Ransomware (ransomware.py)](#python-script-for-ransomware-ransomwarepy)
+      + [Dockerfile](#dockerfile)
+      + [Application Python Script (app.py)](#application-python-script-apppy)
+      + [Various Kubernetes Related Secure Practices](#various-kubernetes-related-secure-practices)
+      + [Possible Exposed Secrets](#possible-exposed-secrets)
+      + [Continuous Integration and Deployment (CI/CD) Configuration](#continuous-integration-and-deployment-cicd-configuration)
+      + [Miscellaneous Concerns](#miscellaneous-concerns)
+      + [Recommendations:](#recommendations)
+- [Partial Scan Example:](#partial-scan-example)
+- [Future Improvements](#future-improvements)
 
 # How to Run Locally
 
