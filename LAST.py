@@ -30,20 +30,24 @@ def get_changed_files_github(directory, base_ref, head_ref):
 
 def get_changed_files(directory):
     """
-    Returns a list of files that have been changed in the pull request, excluding deleted files.
+    Returns a list of files that have been changed locally.
     """
     changed_files = []
     try:
         os.chdir(directory)
         result = subprocess.check_output(["git", "diff", "--name-status"], text=True)
+        if not result.strip():
+            return None  # Indicate no changes
         lines = result.strip().split('\n')
         for line in lines:
-            status, file_path = line.split(maxsplit=1)
-            if status != 'D':  # Exclude deleted files
-                changed_files.append(file_path)
+            if line:  # Check if the line is not empty
+                status, file_path = line.split(maxsplit=1)
+                if status != 'D':  # Exclude deleted files
+                    changed_files.append(file_path)
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
+
 
 
 def get_line_changes_github(directory, base_ref, head_ref):
@@ -189,6 +193,8 @@ def partial_scan(directory):
     Scans files changed locally and includes detailed line changes for security issues.
     """
     changed_files = get_changed_files(directory)
+    if changed_files is None:
+        return "You haven't made any changes to test."
     line_changes = get_line_changes(directory)
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
