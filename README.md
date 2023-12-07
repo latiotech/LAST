@@ -18,6 +18,20 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
       + [Recommendations:](#recommendations)
 - [Partial Scan Example:](#partial-scan-example)
 - [Future Improvements](#future-improvements)
+# Install
+
+```bash
+pip install https://github.com/latiotech/LAST.git
+
+OPENAI_API_KEY=xxx LAST partial ./ 
+```
+
+```bash
+poetry add git+https://github.com/latiotech/LAST.git
+
+OPENAI_API_KEY=xxx LAST partial ./
+
+```
 
 # How to Run Locally
 
