@@ -1,6 +1,9 @@
 # Latio Application Security Tester
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
+[Join the discord or see other Latio projects](https://latio.tech)
+
+
 - [How to Run Locally](#how-to-run-locally)
 - [How to Run in Pipeline](#how-to-run-in-pipeline)
 - [Full Scan Example](#full-scan-example)
