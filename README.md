@@ -24,7 +24,7 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
 # Install
 
 ```bash
-pip install https://github.com/latiotech/LAST.git
+pip install git+https://github.com/latiotech/LAST.git
 
 OPENAI_API_KEY=xxx LAST partial ./ 
 ```
