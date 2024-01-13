@@ -112,9 +112,8 @@ The code changes regarding the removal of the 'printenv' functionality are suffi
 
 
 # Future Improvements
-1. Probably just make this a pip package
-2. Maybe a configure option that asks for your OpenAI key instead of using an env and let's you choose your own models to use based on use case
-3. For full directory scans, calculate number of tokens in advanced and split up the files
-4. Same for Partial Scans
-5. Finish Dockerfile for more elegant pipeline scanning
-6. Make export data in more common format
+1. Maybe a configure option that asks for your OpenAI key instead of using an env and let's you choose your own models to use based on use case
+2. For full directory scans, calculate number of tokens in advanced and split up the files
+3. Same for Partial Scans
+4. Finish Dockerfile for more elegant pipeline scanning
+5. Make export data in more common format
