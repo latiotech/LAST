@@ -274,6 +274,3 @@ def main():
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
         sys.exit(1)
-
-if __name__ == "__main__":
-    main()

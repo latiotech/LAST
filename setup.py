@@ -1,22 +1,23 @@
 from setuptools import setup
-import os
-from setuptools import setup
+from pathlib import Path
 
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 with open('requirements.txt') as f:
     requirements_txt = f.read().splitlines()
 
 setup(
-    name='LAST',
-    version='v0.0.2',
-    packages=[''],
+    name='latio',
+    version='v0.0.04',
     url='https://github.com/latiotech/LAST',
     license='GPL-3.0 license',
     author='James Berthoty',
-    author_email='confusedcrib@gmail.com',
-    description='Latio Application Security Tester',
+    author_email='james@latio.tech',
+    description='Latio Application Security Tester - Uses OpenAPI to scan for security issues in code changes',
     install_requires=requirements_txt,
     entry_points = {
-            'console_scripts': ['LAST = LAST:main'],
+            'console_scripts': ['latio = latio.core:main'],
         },
-
+    long_description=long_description,
+    long_description_content_type='text/markdown'
 )

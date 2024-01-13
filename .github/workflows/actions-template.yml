@@ -17,12 +17,6 @@ jobs:
     - name: Fetch target branch
       run: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
 
-    - uses: actions/checkout@v4
-      with:
-        repository: latiotech/LAST
-        path: LAST
-        ref: main
-
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
@@ -31,11 +25,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r LAST/requirements.txt
+        pip install latio
     
     - name: Analyzing the code with LAST
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
-        python LAST/LAST.py partial-github . ${{ github.base_ref }} ${{ github.head_ref }}
+        python latio partial-github . ${{ github.base_ref }} ${{ github.head_ref }}
 

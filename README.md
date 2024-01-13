@@ -24,24 +24,17 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
 # Install
 
 ```bash
-pip install git+https://github.com/latiotech/LAST.git
+pip install latio
 
-OPENAI_API_KEY=xxx LAST partial ./ 
-```
-
-```bash
-poetry add git+https://github.com/latiotech/LAST.git
-
-OPENAI_API_KEY=xxx LAST partial ./
-
+OPENAI_API_KEY=xxx latio partial ./ 
 ```
 
 # How to Run Locally
 
 1. Get your OpenAI key from [here](https://platform.openai.com/api-keys)
 2. `export OPENAI_API_KEY=<OpenAPI Key>`
-3. Scan only your changed files before merging with `python LAST.py partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
-4. Scan your full application with `python LAST.py full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
+3. Scan only your changed files before merging with `python latio partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
+4. Scan your full application with `python latio full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
 
 # How to Run in Pipeline
 
@@ -54,7 +47,7 @@ This will run OpenAI in pipeline against only your changed files. [Here's an exa
 
 # Full Scan Example
 
-`python LAST.py full ~/git/insecure-kubernetes-deployments/` on [Insecure Deployments Repo](https://github.com/latiotech/insecure-kubernetes-deployments) 
+`latio full ~/git/insecure-kubernetes-deployments/` on [Insecure Deployments Repo](https://github.com/latiotech/insecure-kubernetes-deployments) 
 
 ## Security Review Summary
 
@@ -90,7 +83,7 @@ Files such as `COMMIT_EDITMSG`, `index`, and other Git-related metadata files co
 The `publish-insecure.yml` file for GitHub Actions details automated Docker image building and pushing to Docker Hub upon new releases. Credentials are secured using GitHub secrets, following best practices. However, vulnerabilities within the application or the Dockerfile could lead to weaknesses in the published container.
 
 ### Miscellaneous Concerns
-- The `LAST.yml` potentially triggers the cited "LAST" Python utility. It’s running with the environment variable `OPENAI_API_KEY` from GitHub secrets. Any security risks would depend on the logic within the `LAST.py` script.
+- The `LAST.yml` potentially triggers the cited "LAST" Python utility. It’s running with the environment variable `OPENAI_API_KEY` from GitHub secrets. Any security risks would depend on the logic within the `latio` script.
 - The Git hook samples are committed as `.sample`. They should be reviewed and modified if they are used to enforce security policies.
 - The presence of what seems to be a UUID or token in `packed-refs` and some other files may require examination.
 
@@ -105,7 +98,7 @@ The `publish-insecure.yml` file for GitHub Actions details automated Docker imag
 
 # Partial Scan Example:
 
-`python LAST.py partial ~/git/insecure-kubernetes-deployments/`
+`latio partial ~/git/insecure-kubernetes-deployments/`
 
 The line changes involve the removal of the code related to handling the 'printenv' request, specifically the code that retrieves and displays environment variables in the web interface.
 
