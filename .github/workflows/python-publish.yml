@@ -24,19 +24,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install build requests
 
-    - name: Check if version exists on PyPI
-      id: check_version
-      run: |
-        python -c "
-        import requests
-        from setuptools.config import read_configuration
-        conf_dict = read_configuration('setup.cfg')
-        version = conf_dict['metadata']['version']
-        response = requests.get(f'https://pypi.org/pypi/your-package-name/{version}/json')
-        exists = response.status_code == 200
-        print(f'::set-output name=exists::{exists}')
-        " 
-
     - name: Build package
       if: steps.check_version.outputs.exists != 'true'
       run: python -m build
