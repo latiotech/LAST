@@ -236,7 +236,7 @@ def main():
     """
     # First, parse only the mode argument using sys.argv
     if len(sys.argv) < 2:
-        print("Usage: python LAST.py.py <mode> [<directory>|<repo_name pr_number>]")
+        print("Usage: latio <mode> [<directory>|<repo_name pr_number>]")
         sys.exit(1)
 
     mode = sys.argv[1]
@@ -252,14 +252,14 @@ def main():
     # Remaining arguments and main logic
     if mode == 'full':
         if len(remaining_argv) < 1:
-            print("Usage for full scan: python LAST.py.py full <directory>")
+            print("Usage for full scan: latio full <directory>")
             sys.exit(1)
         directory = remaining_argv[0]
         print(full_scan(directory, model=args.model))
 
     elif mode == 'github':
         if len(remaining_argv) < 2:
-            print("Usage for partial scan: python LAST.py.py partial <repo_name> <pr_number>")
+            print("Usage for partial scan: latio partial <repo_name> <pr_number>")
             sys.exit(1)
         repo_name = remaining_argv[0]
         pr_number = int(remaining_argv[1])
@@ -268,14 +268,14 @@ def main():
 
     elif mode == 'partial':
         if len(remaining_argv) < 1:
-            print("Usage for full scan: python LAST.py.py partial <directory>")
+            print("Usage for full scan: latio partial <directory>")
             sys.exit(1)
         directory = remaining_argv[0]
         print(partial_scan(directory, model=args.model))
 
     elif mode == 'partial-github':
         if len(remaining_argv) < 3:
-            print("Usage for full scan: python LAST.py.py partial <directory>")
+            print("Usage for full scan: latio partial-github <directory> <base_ref> <head_ref>")
             sys.exit(1)
         directory = remaining_argv[0]
         base_ref = remaining_argv[1]
