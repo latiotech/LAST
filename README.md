@@ -16,6 +16,7 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
 - [Install](#Install)
 - [How to Run Locally](#how-to-run-locally)
 - [How to Run in Pipeline](#how-to-run-in-pipeline)
+- [Command Line Options](#command-line-options)
 
 # Install
 
@@ -31,6 +32,7 @@ OPENAI_API_KEY=xxx latio partial ./
 2. `export OPENAI_API_KEY=<OpenAPI Key>`
 3. Scan only your changed files before merging with `python latio partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
 4. Scan your full application with `python latio full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
+5. You can specify `--model` with the [model name from open ai](https://platform.openai.com/docs/models) to experiment
 
 # How to Run in Pipeline
 
@@ -39,4 +41,30 @@ This will run OpenAI in pipeline against only your changed files. [Here's an exa
 1. Get your OpenAI token from [here](https://platform.openai.com/api-keys)
 2. In your repository, go to `github.com/org/repo/settings/secrets/actions` and add a new Repository Secret called `OPENAI_API_KEY` with the value from OpenAI
 3. Copy and paste the `.github/workflows/actions-template.yml` into your own `.github/workflows/` folder
+
+# Command Line Options
+
+## `latio partial <directory> [--model <model_name>]`
+
+Scans only the files that have been changed in the specified directory.
+
+- `<directory>`: Path to the directory where your project is located.
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-3.5-turbo`
+
+Example:
+```bash
+latio partial /path/to/your/project --model gpt-3.5-turbo
+```
+
+## `latio full <directory>`
+
+Scans only the files that have been changed in the specified directory.
+
+- `<directory>`: Path to the directory where your project is located.
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4-1106-preview`
+
+Example:
+```bash
+latio full /path/to/your/project --model gpt-4-1106-preview
+```
 
