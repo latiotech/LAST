@@ -2,7 +2,7 @@
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/latiotech/LAST)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/latiotech/LAST/CI)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/latiotech/LAST/CI) 
 ![GitHub issues](https://img.shields.io/github/issues/latiotech/LAST)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/latiotech/LAST)
 ![GitHub](https://img.shields.io/github/license/latiotech/LAST)
