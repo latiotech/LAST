@@ -4,6 +4,7 @@ import sys
 import requests
 from github import Github
 import subprocess
+import argparse
 
 openaikey = os.environ.get('OPENAI_API_KEY')
 githubkey = os.environ.get('GITHUB_TOKEN')
@@ -65,13 +66,13 @@ def get_line_changes(directory, changed_files):
         print(f"Error getting line changes: {e}")
     return line_changes
 
-def full_sec_scan(application_summary):
+def full_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
     try:
         response = client.chat.completions.create(
-            model="gpt-4-1106-preview",  # Choose the appropriate engine
+            model=model,  # Choose the appropriate engine
             messages=[ 
                 {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing."},
                 {"role": "user", "content": application_summary}
@@ -82,7 +83,7 @@ def full_sec_scan(application_summary):
     except Exception as e:
         return f"Error occurred: {e}"
 
-def full_scan(directory):
+def full_scan(directory, model):
     """
     Scans all files in the specified directory holistically for security issues.
     """
@@ -101,12 +102,12 @@ def full_scan(directory):
                             application_summary += f.read()
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
-    result = full_sec_scan(application_summary)
+    result = full_sec_scan(application_summary, model)
     return result
 
 import time
 
-def partial_sec_scan(application_summary):
+def partial_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
@@ -118,7 +119,7 @@ def partial_sec_scan(application_summary):
         print() 
         # Send the request
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",  # Choose the appropriate engine
+            model=model,  # Choose the appropriate engine
             messages=[ 
                 {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
                 {"role": "user", "content": application_summary}
@@ -201,7 +202,7 @@ def color_diff_line(line):
     else:
         return line
 
-def partial_scan(directory):
+def partial_scan(directory, model):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
@@ -225,7 +226,7 @@ def partial_scan(directory):
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n" + "\n".join(changed_files)
 
     # Send the summary for scanning
-    result = partial_sec_scan(changes_summary)
+    result = partial_sec_scan(changes_summary, model)
     return result
 
 
@@ -233,43 +234,53 @@ def main():
     """
     Main function to perform full or partial security scanning.
     """
+    # First, parse only the mode argument using sys.argv
     if len(sys.argv) < 2:
         print("Usage: python LAST.py.py <mode> [<directory>|<repo_name pr_number>]")
         sys.exit(1)
 
     mode = sys.argv[1]
 
+    # Set the default model based on the mode
+    default_model = 'gpt-4-1106-preview' if mode == 'full' else 'gpt-3.5-turbo'
+
+    # Set up argparse for the --model argument with the conditional default
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--model', type=str, default=default_model, help='Name of the OpenAI model to use, must match exactly from https://platform.openai.com/docs/models/')
+    args, remaining_argv = parser.parse_known_args(sys.argv[2:])
+
+    # Remaining arguments and main logic
     if mode == 'full':
-        if len(sys.argv) < 3:
+        if len(remaining_argv) < 1:
             print("Usage for full scan: python LAST.py.py full <directory>")
             sys.exit(1)
-        directory = sys.argv[2]
-        print(full_scan(directory))
+        directory = remaining_argv[0]
+        print(full_scan(directory, model=args.model))
 
     elif mode == 'github':
-        if len(sys.argv) < 4:
+        if len(remaining_argv) < 2:
             print("Usage for partial scan: python LAST.py.py partial <repo_name> <pr_number>")
             sys.exit(1)
-        repo_name = sys.argv[2]
-        pr_number = int(sys.argv[3])
+        repo_name = remaining_argv[0]
+        pr_number = int(remaining_argv[1])
         github_token = os.environ.get('GITHUB_TOKEN')
-        print(github_scan(repo_name, pr_number, github_token))
+        print(github_scan(repo_name, pr_number, github_token, model=args.model))
 
     elif mode == 'partial':
-        if len(sys.argv) < 3:
+        if len(remaining_argv) < 1:
             print("Usage for full scan: python LAST.py.py partial <directory>")
             sys.exit(1)
-        directory = sys.argv[2]
-        print(partial_scan(directory))
+        directory = remaining_argv[0]
+        print(partial_scan(directory, model=args.model))
 
     elif mode == 'partial-github':
-        if len(sys.argv) < 3:
+        if len(remaining_argv) < 3:
             print("Usage for full scan: python LAST.py.py partial <directory>")
             sys.exit(1)
-        directory = sys.argv[2]
-        base_ref = sys.argv[3]
-        head_ref = sys.argv[4]
-        print(partial_scan_github(directory, base_ref, head_ref))
+        directory = remaining_argv[0]
+        base_ref = remaining_argv[1]
+        head_ref = remaining_argv[2]
+        print(partial_scan_github(directory, base_ref, head_ref, model=args.model))
 
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
