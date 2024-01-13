@@ -7,7 +7,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='LAST',
-    version='v0.0.1',
+    version='v0.0.2',
     packages=[''],
     url='https://github.com/latiotech/LAST',
     license='GPL-3.0 license',
