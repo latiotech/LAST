@@ -6,7 +6,9 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
 ![GitHub issues](https://img.shields.io/github/issues/latiotech/LAST)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/latiotech/LAST)
 ![GitHub](https://img.shields.io/github/license/latiotech/LAST)
-![Discord](https://img.shields.io/discord/1119809850239614978) 
+![Discord](https://img.shields.io/discord/1119809850239614978)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/latio)
+
 
 [About Latio](https://latio.tech)  
 [Find Security Tools](https://latio.tech)  
