@@ -18,13 +18,31 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.x'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build
+        pip install build requests
+
+    - name: Check if version exists on PyPI
+      id: check_version
+      run: |
+        python -c "
+        import requests
+        from setuptools.config import read_configuration
+        conf_dict = read_configuration('setup.cfg')
+        version = conf_dict['metadata']['version']
+        response = requests.get(f'https://pypi.org/pypi/your-package-name/{version}/json')
+        exists = response.status_code == 200
+        print(f'::set-output name=exists::{exists}')
+        " 
+
     - name: Build package
+      if: steps.check_version.outputs.exists != 'true'
       run: python -m build
+
     - name: Publish package
+      if: steps.check_version.outputs.exists != 'true'
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
