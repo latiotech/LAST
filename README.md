@@ -2,10 +2,10 @@
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/latiotech/LAST)
+![GitHub stars](https://img.shields.io/github/stars/latiotech/LAST?style=social)
 ![GitHub issues](https://img.shields.io/github/issues/latiotech/LAST)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/latiotech/LAST)
 ![GitHub](https://img.shields.io/github/license/latiotech/LAST)
-![GitHub stars](https://img.shields.io/github/stars/latiotech/LAST?style=social)
 ![Discord](https://img.shields.io/discord/1119809850239614978) 
 
 [About Latio](https://latio.tech)  
