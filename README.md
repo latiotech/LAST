@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/logo.png" width="80" ><br><h1 align="center">Latio Application Security Tester</h1>
+<p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/logo.png" width="150" ><br><h1 align="center">Latio Application Security Tester</h1>
 </p>
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
