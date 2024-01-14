@@ -57,7 +57,7 @@ Example:
 latio partial /path/to/your/project --model gpt-3.5-turbo
 ```
 
-## `latio full <directory>`
+## `latio full <directory> [--model <model_name>]`
 
 Scans only the files that have been changed in the specified directory.
 
