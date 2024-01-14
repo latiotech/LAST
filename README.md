@@ -1,6 +1,5 @@
 <p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/logo.png" width="150" ><br><h1 align="center">Latio Application Security Tester</h1>
 </p>
-Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token.
 
 ![GitHub stars](https://img.shields.io/github/stars/latiotech/LAST?style=social)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/latiotech/LAST)
@@ -10,6 +9,7 @@ Use OpenAI to scan your code for security issues from the CLI. Bring your own Op
 [![Discord](https://img.shields.io/discord/1119809850239614978)](https://discord.gg/k5aBQ55j5M)
 [![PyPI - Versions](https://img.shields.io/pypi/v/latio)](https://pypi.org/project/latio/)
 
+Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.
 
 [About Latio](https://latio.tech)  
 [Find Security Tools](https://latio.tech)  
