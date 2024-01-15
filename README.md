@@ -12,7 +12,7 @@
 Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.
 
 [About Latio](https://latio.tech)  
-[Find Security Tools](https://latio.tech)  
+[Find Security Tools](https://list.latio.tech)  
 
 - [Install](#Install)
 - [How to Run Locally](#how-to-run-locally)
