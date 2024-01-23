@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='latio',
-    version='v0.0.05',
+    version='v0.0.06',
     url='https://github.com/latiotech/LAST',
     license='GPL-3.0 license',
     author='James Berthoty',
