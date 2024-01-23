@@ -131,7 +131,7 @@ def partial_sec_scan(application_summary, model):
         return f"Error occurred: {e}"
 
 
-def github_scan(repo_name, pr_number, github_token):
+def github_scan(repo_name, pr_number, github_token, model):
     """
     Scans files changed in the specified GitHub pull request holistically.
     """
@@ -149,15 +149,15 @@ def github_scan(repo_name, pr_number, github_token):
             changes_summary += response.text
         else:
             print(f"Failed to fetch {file.filename}")
-    result = partial_sec_scan(changes_summary)
+    result = partial_sec_scan(changes_summary, model)
     return result
 
-def partial_scan_github(directory, base_ref, head_ref):
+def partial_scan_github(directory, base_ref, head_ref, model):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
     changed_files = get_changed_files_github(directory, base_ref, head_ref)
-    line_changes = get_line_changes_github(directory, base_ref, head_ref)
+    line_changes = get_line_changes(directory, changed_files)
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n"
 
     for file_path in changed_files:
@@ -177,7 +177,7 @@ def partial_scan_github(directory, base_ref, head_ref):
             print("No changed files to scan.")
             return
         if changes_summary:
-            result = partial_sec_scan(changes_summary)
+            result = partial_sec_scan(changes_summary, model)
             return result
         else:
             return "No changed files to scan."
