@@ -1,5 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/logo.png" width="150" ><br><h1 align="center">Latio Application Security Tester</h1>
-</p>
+<p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/logo.png" width="150" ><br><h1 align="center">Latio Application Security Tester</h1></p>
 
 ![GitHub stars](https://img.shields.io/github/stars/latiotech/LAST?style=social)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/latiotech/LAST)
@@ -9,7 +8,11 @@
 [![Discord](https://img.shields.io/discord/1119809850239614978)](https://discord.gg/k5aBQ55j5M)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/latio)](https://pypi.org/project/latio/)
 
-Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.
+<h3>Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.</h3></br>
+<img src="./LAST.gif" width=50%>
+<img src="https://raw.githubusercontent.com/latiotech/LAST/main/LAST.gif" width=50% >
+</br>
+</br>
 
 [About Latio](https://latio.tech)  
 [Find Security Tools](https://list.latio.tech)  
@@ -68,4 +71,3 @@ Example:
 ```bash
 latio full /path/to/your/project --model gpt-4-1106-preview
 ```
-
