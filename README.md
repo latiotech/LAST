@@ -9,7 +9,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/latio)](https://pypi.org/project/latio/)
 
 <h3>Use OpenAI to scan your code for security issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.</h3></br>
-<img src="https://raw.githubusercontent.com/latiotech/LAST/main/LAST.gif" width=50% >
+<p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/LAST.gif" width=75% ></p>
 </br>
 </br>
 
