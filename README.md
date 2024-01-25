@@ -39,34 +39,36 @@ OPENAI_API_KEY=xxx latio partial ./
 
 # How to Run in Pipeline
 
-This will run OpenAI in pipeline against only your changed files. [Here's an example](https://github.com/latiotech/insecure-kubernetes-deployments/actions/runs/7081197080/job/19270126283?pr=6) of what it looks like, it uses GPT-3.5 to scan only changed files, so it's relatively cheap.
+This will run OpenAI in pipeline against only your changed files. [Here's an example](https://github.com/latiotech/insecure-kubernetes-deployments/actions/runs/7619084201/job/20845086343) of what it looks like, it uses GPT-3.5 to scan only changed files, so it's relatively cheap.
 
 1. Get your OpenAI token from [here](https://platform.openai.com/api-keys)
 2. In your repository, go to `github.com/org/repo/settings/secrets/actions` and add a new Repository Secret called `OPENAI_API_KEY` with the value from OpenAI
-3. Copy and paste the `.github/workflows/actions-template.yml` into your own `.github/workflows/` folder
+3. Copy and paste the `.github/workflows/actions-template-security.yml` (or `-health` for health scan) into your own `.github/workflows/` folder.
 
 # Command Line Options
 
-## `latio partial <directory> [--model <model_name>]`
+## `latio partial <directory> [--model <model_name>] [--health]`
 
 Scans only the files that have been changed in the specified directory.
 
 - `<directory>`: Path to the directory where your project is located.
 - `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-3.5-turbo`
+- `--health`: (Optional) Runs a prompt focused on code optimization
 
 Example:
 ```bash
-latio partial /path/to/your/project --model gpt-3.5-turbo
+latio partial /path/to/your/project --model gpt-3.5-turbo --health
 ```
 
-## `latio full <directory> [--model <model_name>]`
+## `latio full <directory> [--model <model_name>] [--health]`
 
 Scans only the files that have been changed in the specified directory.
 
 - `<directory>`: Path to the directory where your project is located.
 - `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4-1106-preview`
+- `--health`: (Optional) Runs a prompt focused on code optimization
 
 Example:
 ```bash
-latio full /path/to/your/project --model gpt-4-1106-preview
+latio full /path/to/your/project --model gpt-4-1106-preview --health
 ```

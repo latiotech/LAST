@@ -21,9 +21,13 @@ def get_changed_files_github(directory, base_ref, head_ref):
         result = subprocess.check_output(["git", "diff", "--name-status", f"{base_ref}...{head_ref}"], text=True)
         lines = result.strip().split('\n')
         for line in lines:
-            status, file_path = line.split(maxsplit=1)
-            if status != 'D':  # Exclude deleted files
-                changed_files.append(file_path)
+            parts = line.split(None, 1)
+            if len(parts) == 2:
+                status, file_path = parts
+                if status != 'D':
+                    changed_files.append(file_path)
+            else:
+                raise ValueError(f"Unexpected format in git diff output: '{line}'")
     except subprocess.CalledProcessError as e:
         print(f"Error getting changed files: {e}")
     return changed_files
@@ -82,8 +86,26 @@ def full_sec_scan(application_summary, model):
         return message
     except Exception as e:
         return f"Error occurred: {e}"
+    
+def full_health_scan(application_summary, model):
+    """
+    This function sends a code snippet to OpenAI's API to check for optimizations.
+    """
+    try:
+        response = client.chat.completions.create(
+            model=model,  # Choose the appropriate engine
+            messages=[ 
+                {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive the full code for an application. Your task is to review the code for optimizations and improvements, calling out the major bottlenecks. Don't overly focus on one file, and instead provide the best optimizations based on what you think the entire application is doing."},
+                {"role": "user", "content": application_summary}
+            ]
+        )
+        message = response.choices[0].message.content
+        return message
+    except Exception as e:
+        return f"Error occurred: {e}"
 
-def full_scan(directory, model):
+
+def full_scan(directory, model, health=False):
     """
     Scans all files in the specified directory holistically for security issues.
     """
@@ -102,7 +124,10 @@ def full_scan(directory, model):
                             application_summary += f.read()
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
-    result = full_sec_scan(application_summary, model)
+    if health:
+        result = full_health_scan(application_summary, model)
+    else:
+        result = full_sec_scan(application_summary, model)
     return result
 
 import time
@@ -112,16 +137,31 @@ def partial_sec_scan(application_summary, model):
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
     try:
-        print("Waiting for response", end="")
-        for _ in range(5): 
-            time.sleep(1) 
-            print(".", end="", flush=True) 
-        print() 
+        print("Waiting for response from AI...")
         # Send the request
         response = client.chat.completions.create(
             model=model,  # Choose the appropriate engine
             messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
+                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
+                {"role": "user", "content": application_summary}
+            ]
+        )
+        message = response.choices[0].message.content
+        return message
+    except Exception as e:
+        return f"Error occurred: {e}"
+    
+def partial_health_scan(application_summary, model):
+    """
+    This function sends a code snippet to OpenAI's API to check for code optimizations.
+    """
+    try:
+        print("Waiting for response from AI...")
+        # Send the request
+        response = client.chat.completions.create(
+            model=model,  # Choose the appropriate engine
+            messages=[ 
+                {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the changed code for optimizations and improvements, calling out any potential slowdowns. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
                 {"role": "user", "content": application_summary}
             ]
         )
@@ -131,7 +171,8 @@ def partial_sec_scan(application_summary, model):
         return f"Error occurred: {e}"
 
 
-def github_scan(repo_name, pr_number, github_token, model):
+
+def github_scan(repo_name, pr_number, github_token, model, health=False):
     """
     Scans files changed in the specified GitHub pull request holistically.
     """
@@ -149,10 +190,13 @@ def github_scan(repo_name, pr_number, github_token, model):
             changes_summary += response.text
         else:
             print(f"Failed to fetch {file.filename}")
-    result = partial_sec_scan(changes_summary, model)
+    if health:
+        result = partial_health_scan(changes_summary, model)
+    else:
+        result = partial_sec_scan(changes_summary, model)
     return result
 
-def partial_scan_github(directory, base_ref, head_ref, model):
+def partial_scan_github(directory, base_ref, head_ref, model, health=False):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
@@ -177,7 +221,10 @@ def partial_scan_github(directory, base_ref, head_ref, model):
             print("No changed files to scan.")
             return
         if changes_summary:
-            result = partial_sec_scan(changes_summary, model)
+            if health:
+                result = partial_health_scan(changes_summary, model)
+            else:
+                result = partial_sec_scan(changes_summary, model)
             return result
         else:
             return "No changed files to scan."
@@ -199,10 +246,9 @@ def color_diff_line(line):
         return color_text(line, "32") 
     elif line.startswith('-'):
         return color_text(line, "31") 
-    else:
-        return line
+    return line
 
-def partial_scan(directory, model):
+def partial_scan(directory, model, health=False):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
@@ -226,7 +272,10 @@ def partial_scan(directory, model):
     changes_summary = "Detailed Line Changes:\n" + line_changes + "\n\nChanged Files:\n" + "\n".join(changed_files)
 
     # Send the summary for scanning
-    result = partial_sec_scan(changes_summary, model)
+    if health:
+        result = partial_health_scan(changes_summary, model)
+    else:
+        result = partial_sec_scan(changes_summary, model)
     return result
 
 
@@ -247,6 +296,7 @@ def main():
     # Set up argparse for the --model argument with the conditional default
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--model', type=str, default=default_model, help='Name of the OpenAI model to use, must match exactly from https://platform.openai.com/docs/models/')
+    parser.add_argument('--health', action='store_true', help='Focus on health and optimization instead of security')
     args, remaining_argv = parser.parse_known_args(sys.argv[2:])
 
     # Remaining arguments and main logic
@@ -255,7 +305,7 @@ def main():
             print("Usage for full scan: latio full <directory>")
             sys.exit(1)
         directory = remaining_argv[0]
-        print(full_scan(directory, model=args.model))
+        print(full_scan(directory, model=args.model, health=args.health))
 
     elif mode == 'github':
         if len(remaining_argv) < 2:
@@ -264,23 +314,23 @@ def main():
         repo_name = remaining_argv[0]
         pr_number = int(remaining_argv[1])
         github_token = os.environ.get('GITHUB_TOKEN')
-        print(github_scan(repo_name, pr_number, github_token, model=args.model))
+        print(github_scan(repo_name, pr_number, github_token, model=args.model, health=args.health))
 
     elif mode == 'partial':
         if len(remaining_argv) < 1:
             print("Usage for full scan: latio partial <directory>")
             sys.exit(1)
         directory = remaining_argv[0]
-        print(partial_scan(directory, model=args.model))
+        print(partial_scan(directory, model=args.model, health=args.health))
 
     elif mode == 'partial-github':
         if len(remaining_argv) < 3:
-            print("Usage for full scan: latio partial-github <directory> <base_ref> <head_ref>")
+            print("Usage for github scan: latio partial-github <directory> <base_ref> <head_ref>")
             sys.exit(1)
         directory = remaining_argv[0]
         base_ref = remaining_argv[1]
         head_ref = remaining_argv[2]
-        print(partial_scan_github(directory, base_ref, head_ref, model=args.model))
+        print(partial_scan_github(directory, base_ref, head_ref, model=args.model, health=args.health))
 
     else:
         print("Invalid mode. Use 'full' or 'partial'.")

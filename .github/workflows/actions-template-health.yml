@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  LAST-Scan:
+  LAST-Health-Scan:
     runs-on: ubuntu-latest
     steps:
 
@@ -31,5 +31,5 @@ jobs:
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
-        latio partial-github . ${{ github.base_ref }} ${{ github.head_ref }}
+        latio partial-github . ${{ github.base_ref }} ${{ github.head_ref }} --health
 
