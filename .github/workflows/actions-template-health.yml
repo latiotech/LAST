@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  LAST-Scan:
+  LAST-Health-Scan:
     runs-on: ubuntu-latest
     steps:
 
