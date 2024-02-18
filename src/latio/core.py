@@ -5,11 +5,22 @@ import requests
 from github import Github
 import subprocess
 import argparse
+import pathlib
+import textwrap
+import google.generativeai as genai
+from IPython.display import display
+from IPython.display import Markdown
+
+def to_markdown(text):
+    text = text.replace('•', '  *')
+    return textwrap.indent(text, '> ', predicate=lambda _: True)
 
 openaikey = os.environ.get('OPENAI_API_KEY')
 githubkey = os.environ.get('GITHUB_TOKEN')
+googleapikey = os.environ.get('GEMINI_API_KEY')
 
 client = OpenAI(api_key=openaikey)
+genai.configure(api_key=googleapikey)
 
 def get_changed_files_github(directory, base_ref, head_ref):
     """
@@ -74,36 +85,53 @@ def full_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
-    try:
-        response = client.chat.completions.create(
-            model=model,  # Choose the appropriate engine
-            messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing."},
-                {"role": "user", "content": application_summary}
-            ]
-        )
-        message = response.choices[0].message.content
-        return message
-    except Exception as e:
-        return f"Error occurred: {e}"
+    if model == 'gemini-pro':
+        try:
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content("You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing. Here is the code: " + application_summary)
+            message = to_markdown(response.text)
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
+    else:
+        try:
+            response = client.chat.completions.create(
+                model=model,  # Choose the appropriate engine
+                messages=[ 
+                    {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing."},
+                    {"role": "user", "content": application_summary}
+                ]
+            )
+            message = response.choices[0].message.content
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
     
 def full_health_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for optimizations.
     """
-    try:
-        response = client.chat.completions.create(
-            model=model,  # Choose the appropriate engine
-            messages=[ 
-                {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive the full code for an application. Your task is to review the code for optimizations and improvements, calling out the major bottlenecks. Don't overly focus on one file, and instead provide the best optimizations based on what you think the entire application is doing."},
-                {"role": "user", "content": application_summary}
-            ]
-        )
-        message = response.choices[0].message.content
-        return message
-    except Exception as e:
-        return f"Error occurred: {e}"
-
+    if model == 'gemini-pro':
+        try:
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content("You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive the full code for an application. Your task is to review the code for optimizations and improvements, calling out the major bottlenecks. Don't overly focus on one file, and instead provide the best optimizations based on what you think the entire application is doing. Here is the code: " + application_summary)
+            message = to_markdown(response.text)
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
+    else:
+        try:
+            response = client.chat.completions.create(
+                model=model,  # Choose the appropriate engine
+                messages=[ 
+                    {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive the full code for an application. Your task is to review the code for optimizations and improvements, calling out the major bottlenecks. Don't overly focus on one file, and instead provide the best optimizations based on what you think the entire application is doing."},
+                    {"role": "user", "content": application_summary}
+                ]
+            )
+            message = response.choices[0].message.content
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
 
 def full_scan(directory, model, health=False):
     """
@@ -136,41 +164,57 @@ def partial_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
-    try:
-        print("Waiting for response from AI...")
-        # Send the request
-        response = client.chat.completions.create(
-            model=model,  # Choose the appropriate engine
-            messages=[ 
-                {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
-                {"role": "user", "content": application_summary}
-            ]
-        )
-        message = response.choices[0].message.content
-        return message
-    except Exception as e:
-        return f"Error occurred: {e}"
+    if model == 'gemini-pro':
+        try:
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content("You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files. Here is the code: " + application_summary)
+            message = to_markdown(response.text)
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
+    else:
+        try:
+            print("Waiting for response from AI...")
+            # Send the request
+            response = client.chat.completions.create(
+                model=model,  # Choose the appropriate engine
+                messages=[ 
+                    {"role": "system", "content": "You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
+                    {"role": "user", "content": application_summary}
+                ]
+            )
+            message = response.choices[0].message.content
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
     
 def partial_health_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for code optimizations.
     """
-    try:
-        print("Waiting for response from AI...")
-        # Send the request
-        response = client.chat.completions.create(
-            model=model,  # Choose the appropriate engine
-            messages=[ 
-                {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the changed code for optimizations and improvements, calling out any potential slowdowns. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
-                {"role": "user", "content": application_summary}
-            ]
-        )
-        message = response.choices[0].message.content
-        return message
-    except Exception as e:
-        return f"Error occurred: {e}"
-
-
+    if model == 'gemini-pro':
+        try:
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content("You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the changed code for optimizations and improvements, calling out any potential slowdowns. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files. Here is the code: " + application_summary)
+            message = to_markdown(response.text)
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
+    else:
+        try:
+            print("Waiting for response from AI...")
+            # Send the request
+            response = client.chat.completions.create(
+                model=model,  # Choose the appropriate engine
+                messages=[ 
+                    {"role": "system", "content": "You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the changed code for optimizations and improvements, calling out any potential slowdowns. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files."},
+                    {"role": "user", "content": application_summary}
+                ]
+            )
+            message = response.choices[0].message.content
+            return message
+        except Exception as e:
+            return f"Error occurred: {e}"
 
 def github_scan(repo_name, pr_number, github_token, model, health=False):
     """
@@ -295,7 +339,7 @@ def main():
 
     # Set up argparse for the --model argument with the conditional default
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--model', type=str, default=default_model, help='Name of the OpenAI model to use, must match exactly from https://platform.openai.com/docs/models/')
+    parser.add_argument('--model', type=str, default=default_model, help='Name of the model to use, must match exactly from https://platform.openai.com/docs/models/ or for Google Gemini use gemini-pro')
     parser.add_argument('--health', action='store_true', help='Focus on health and optimization instead of security')
     args, remaining_argv = parser.parse_known_args(sys.argv[2:])
 

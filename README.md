@@ -33,10 +33,10 @@ latio partial ./
 
 # How to Run Locally
 
-1. Get your OpenAI key from [here](https://platform.openai.com/api-keys)
-2. `export OPENAI_API_KEY=<OpenAPI Key>`
-3. Scan only your changed files before merging with `python latio partial /path/to/directory`. This uses the GPT-3.5-turbo model so it's cheap and fast.
-4. Scan your full application with `python latio full /path/to/directory`. This uses the beta model of gpt-4 so it's extremely expensive. Scanning this application once for example took about $1. Additionally, you may need to split your app into smaller directories, because the model has a 128,000 token limit 
+1. Get your OpenAI key from [here](https://platform.openai.com/api-keys), and/or your Google API key [here](https://aistudio.google.com/app/apikey)
+2. `export OPENAI_API_KEY=<OpenAPI Key>` and/or `export GEMINI_API_KEY=<Gemini API Key>`
+3. Scan only your changed files before merging with `latio partial /path/to/directory`. This uses the GPT-3.5-turbo model by default. For Google, use `python latio partial /path/to/directory --model=gemini-pro`
+4. Scan your full application with `latio full /path/to/directory`. This uses the beta model of gpt-4 by default. Scanning this application once for example took about $1. Due to the context window, you may need to pass specific folders. For google, use `latio full /path/to/directory --model=gemini-pro`
 5. You can specify `--model` with the [model name from open ai](https://platform.openai.com/docs/models) to experiment
 
 # How to Run in Pipeline
