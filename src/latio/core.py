@@ -15,6 +15,8 @@ def to_markdown(text):
     text = text.replace('•', '  *')
     return textwrap.indent(text, '> ', predicate=lambda _: True)
 
+google_models = ['gemini-pro']
+
 openaikey = os.environ.get('OPENAI_API_KEY')
 githubkey = os.environ.get('GITHUB_TOKEN')
 googleapikey = os.environ.get('GEMINI_API_KEY')
@@ -85,7 +87,7 @@ def full_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
-    if model == 'gemini-pro':
+    if model in google_models:
         try:
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content("You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive the full code for an application. Your task is to review the code for security vulnerabilities and suggest improvements. Don't overly focus on one file, and instead provide the top security concerns based on what you think the entire application is doing. Here is the code: " + application_summary)
@@ -111,7 +113,7 @@ def full_health_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for optimizations.
     """
-    if model == 'gemini-pro':
+    if model in google_models:
         try:
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content("You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive the full code for an application. Your task is to review the code for optimizations and improvements, calling out the major bottlenecks. Don't overly focus on one file, and instead provide the best optimizations based on what you think the entire application is doing. Here is the code: " + application_summary)
@@ -164,7 +166,7 @@ def partial_sec_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for security vulnerabilities.
     """
-    if model == 'gemini-pro':
+    if model in google_models:
         try:
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content("You are an application security expert, skilled in explaining complex programming vulnerabilities with simplicity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the code change for security vulnerabilities and suggest improvements. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Suggest specific code fixes where applicable. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files. Here is the code: " + application_summary)
@@ -192,7 +194,7 @@ def partial_health_scan(application_summary, model):
     """
     This function sends a code snippet to OpenAI's API to check for code optimizations.
     """
-    if model == 'gemini-pro':
+    if model in google_models:
         try:
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content("You are a world class 10x developer who gives kind suggestions for remediating code smells and optimizing for big O complexity. You will receive changed code as part of a pull request, followed by the rest of the file. Your task is to review the changed code for optimizations and improvements, calling out any potential slowdowns. Pay attention to if the code is getting added or removed indicated by the + or - at the beginning of the line. Focus the most on the code that is being changed, which starts with Detailed Line Changes, instead of Changed Files. Here is the code: " + application_summary)
