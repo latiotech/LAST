@@ -8,7 +8,7 @@
 [![Discord](https://img.shields.io/discord/1119809850239614978)](https://discord.gg/k5aBQ55j5M)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/latio)](https://pypi.org/project/latio/)
 
-<h3>Use OpenAI to scan your code for security and health issues from the CLI. Bring your own OpenAI token. Options to scan full code, code changes, or in pipeline.</h3></br>
+<h3>Use OpenAI or Gemini to scan your code for security and health issues from the CLI. Bring your own tokens. Options to scan full code, code changes, or in pipeline.</h3></br>
 <p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/LAST.gif" width=75% ></p>
 </br>
 </br>
