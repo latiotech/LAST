@@ -4,3 +4,4 @@ Requests==2.31.0
 google-generativeai==0.3.2
 pylance==0.9.17
 ipython==8.21.0
+plance==0.9.1
