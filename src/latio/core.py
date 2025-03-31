@@ -22,7 +22,7 @@ def to_markdown(text):
 google_models = ['gemini-pro']
 
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
-
+githubkey = os.environ.get('GITHUB_TOKEN')
 googleapikey = os.environ.get('GEMINI_API_KEY')
 
 genai.configure(api_key=googleapikey)
@@ -67,7 +67,6 @@ def get_changed_files(directory):
             os.chdir(original_dir)
             return []
             
-        # Try a more comprehensive approach to get all changed files
         try:
             # Get unstaged changes
             unstaged = subprocess.check_output(["git", "diff", "--name-only"], text=True).strip().split('\n')
@@ -93,7 +92,6 @@ def get_changed_files(directory):
         traceback.print_exc()
         return []
     finally:
-        # Make sure we return to the original directory
         if 'original_dir' in locals():
             os.chdir(original_dir)
 
@@ -168,7 +166,6 @@ def get_line_changes(directory, changed_files):
             # If still no changes found, this is unexpected
             if not found_changes:
                 print(f"Warning: No changes found for {file} despite it being in the changed files list")
-                # As a fallback, include the entire file for analysis
                 try:
                     with open(file, 'r') as f:
                         content = f.read()
