@@ -1,6 +1,7 @@
-openai==1.3.7
+openai>=0.27.8,<0.28.0
 PyGithub==2.1.1
 Requests==2.31.0
 google-generativeai==0.3.2
 pylance==0.9.17
 ipython==8.21.0
+openai-agent==0.1.0
