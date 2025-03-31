@@ -8,7 +8,7 @@
 [![Discord](https://img.shields.io/discord/1119809850239614978)](https://discord.gg/k5aBQ55j5M)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/latio)](https://pypi.org/project/latio/)
 
-<h3>Use OpenAI or Gemini to scan your code for security and health issues from the CLI. Bring your own tokens. Options to scan full code, code changes, or in pipeline.</h3></br>
+<h3>Use OpenAI or Gemini to scan your code for security and health issues from the CLI. Bring your own tokens. Options to scan full code, code changes, or in pipeline. Now with AI agents for deeper analysis and automated fixes.</h3></br>
 <p align="center"><img src="https://raw.githubusercontent.com/latiotech/LAST/main/LAST.gif" width=75% ></p>
 </br>
 </br>
@@ -28,18 +28,23 @@ pip install latio
 
 export OPENAI_API_KEY=xxx
 
-latio partial ./ 
+latio partial-agentic ./ 
 ```
+`partial-agentic` should be used on a new branch
+`full-agentic` can be used on an existing code base
 
 # How to Run Locally
 
 1. Get your OpenAI key from [here](https://platform.openai.com/api-keys), and/or your Google API key [here](https://aistudio.google.com/app/apikey)
 2. `export OPENAI_API_KEY=<OpenAPI Key>` and/or `export GEMINI_API_KEY=<Gemini API Key>`
-3. Scan only your changed files before merging with `latio partial /path/to/directory`. This uses the GPT-3.5-turbo model by default. For Google, use `python latio partial /path/to/directory --model=gemini-pro`
-4. Scan your full application with `latio full /path/to/directory`. This uses the beta model of gpt-4 by default. Scanning this application once for example took about $1. Due to the context window, you may need to pass specific folders. For google, use `latio full /path/to/directory --model=gemini-pro`
-5. You can specify `--model` with the [model name from open ai](https://platform.openai.com/docs/models) to experiment
+3. Scan only your changed files before merging with `latio partial /path/to/directory`. This uses the gpt-4o model by default. For Google, use `python latio partial /path/to/directory --model=gemini-pro`
+4. Scan your full application with `latio full /path/to/directory`. This uses gpt-4o by default. Due to the context window, you may need to pass specific folders. For google, use `latio full /path/to/directory --model=gemini-pro`
+5. Use the agentic analysis with `latio partial-agentic` or `latio full-agentic` for deeper code understanding and automated fixes
+6. You can specify `--model` with the [model name from open ai](https://platform.openai.com/docs/models) to experiment
 
 # How to Run in Pipeline
+
+*Functionality currently busted*
 
 This will run OpenAI in pipeline against only your changed files. [Here's an example](https://github.com/latiotech/insecure-kubernetes-deployments/actions/runs/7619084201/job/20845086343) of what it looks like, it uses GPT-3.5 to scan only changed files, so it's relatively cheap.
 
@@ -54,23 +59,49 @@ This will run OpenAI in pipeline against only your changed files. [Here's an exa
 Scans only the files that have been changed in the specified directory.
 
 - `<directory>`: Path to the directory where your project is located.
-- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-3.5-turbo`
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4o`
 - `--health`: (Optional) Runs a prompt focused on code optimization
 
 Example:
 ```bash
-latio partial /path/to/your/project --model gpt-3.5-turbo --health
+latio partial /path/to/your/project --model gpt-4o --health
+```
+
+## `latio partial-agentic <directory> [--model <model_name>] [--health]`
+
+Scans only the files that have been changed in the specified directory using AI agents for deeper analysis.
+
+- `<directory>`: Path to the directory where your project is located.
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4o`
+- `--health`: (Optional) Runs a prompt focused on code optimization
+
+Example:
+```bash
+latio partial-agentic /path/to/your/project --model gpt-4o --health
 ```
 
 ## `latio full <directory> [--model <model_name>] [--health]`
 
-Scans only the files that have been changed in the specified directory.
+Scans your entire codebase for security and health issues.
 
 - `<directory>`: Path to the directory where your project is located.
-- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4-1106-preview`
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4o`
 - `--health`: (Optional) Runs a prompt focused on code optimization
 
 Example:
 ```bash
-latio full /path/to/your/project --model gpt-4-1106-preview --health
+latio full /path/to/your/project --model gpt-4o --health
+```
+
+## `latio full-agentic <directory> [--model <model_name>] [--health]`
+
+Scans your entire codebase using AI agents for deeper analysis and automated fixes.
+
+- `<directory>`: Path to the directory where your project is located.
+- `--model <model_name>`: (Optional) Specifies the name of the OpenAI model to use for the scan. Defaults to `gpt-4o`
+- `--health`: (Optional) Runs a prompt focused on code optimization
+
+Example:
+```bash
+latio full-agentic /path/to/your/project --model gpt-4o --health
 ```
