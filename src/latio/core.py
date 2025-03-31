@@ -268,7 +268,50 @@ def full_scan(directory, model, health=False):
         result = full_sec_scan(application_summary, model)
     return result
 
-import time
+async def full_agent_scan(directory, model, health=False):
+    """
+    Scans files changed locally and includes detailed line changes for security issues.
+    """
+    file_list = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                with open(file_path, 'r') as f:
+                    line_count = len(f.readlines())
+                file_list.append(f"{file_path} ({line_count} lines)")
+            except Exception as e:
+                file_list.append(f"{file_path} (error reading file: {str(e)})")
+    application_summary = "\n".join(file_list)
+
+    prompt = "Here are all of the files in this application: " + application_summary
+    try:
+        # Try with proper error handling
+        print("Sending to context agent...")
+        security_tool = workers.security_agent.as_tool(
+            tool_name="security_agent",
+            tool_description="Specialist in evaluating code for security issues."
+        ) 
+        health_tool = workers.health_agent.as_tool(
+            tool_name="health_agent",
+            tool_description="Specialist in evaluating code for health issues."
+        )
+        full_context_code_gatherer = workers.full_context_agent_code.as_tool(
+            tool_name="full_context_agent_code",
+            tool_description="Specialist in evaluating code for security and health issues."
+        )
+        full_context_with_tools = workers.full_context_file_parser.clone(tools=[full_context_code_gatherer, security_tool, health_tool, workers.gather_full_code])
+        result = await Runner.run(full_context_with_tools, prompt)
+
+        print("Received response from full context agent")
+                
+        return result
+    except Exception as e:
+        print(f"Error in context agent: {e}")
+        import traceback
+        traceback.print_exc()
+        return color_text(f"Error during analysis: {str(e)}", "31")
+
 
 def partial_sec_scan(application_summary, model):
     """
@@ -511,6 +554,19 @@ def main():
         directory = remaining_argv[0]
         print(full_scan(directory, model=args.model, health=args.health))
 
+    elif mode == 'full-agentic':
+        if len(remaining_argv) < 1:
+            print("Usage for full scan: latio full-agentic <directory>")
+            sys.exit(1)
+        directory = remaining_argv[0]
+        try:
+            result = asyncio.run(full_agent_scan(directory, model=args.model, health=args.health))
+            print(result)
+        except Exception as e:
+            print(f"Error during partial scan: {e}")
+            import traceback
+            traceback.print_exc()
+
     elif mode == 'github':
         if len(remaining_argv) < 2:
             print("Usage for partial scan: latio partial <repo_name> <pr_number>")
@@ -553,3 +609,7 @@ def main():
     else:
         print("Invalid mode. Use 'full' or 'partial'.")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
