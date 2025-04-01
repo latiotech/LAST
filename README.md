@@ -42,6 +42,10 @@ latio partial-agentic ./
 5. Use the agentic analysis with `latio partial-agentic` or `latio full-agentic` for deeper code understanding and automated fixes
 6. You can specify `--model` with the [model name from open ai](https://platform.openai.com/docs/models) to experiment
 
+# Known Issues
+1. Haven't tested gemini for 2.5
+2. github workflows currently don't work, but should be switched over to the agentic model
+
 # How to Run in Pipeline
 
 *Functionality currently busted*
