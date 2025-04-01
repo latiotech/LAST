@@ -305,6 +305,7 @@ async def full_agent_scan(directory, model, health=False):
         )
         full_context_with_tools = workers.full_context_file_parser.clone(tools=[full_context_code_gatherer, security_tool, health_tool, workers.gather_full_code])
         result = await Runner.run(full_context_with_tools, prompt)
+        result = result.final_output
 
         print("Received response from full context agent")
                 
@@ -489,6 +490,7 @@ async def partial_agent_scan(directory, model, health=False):
         )
         context_with_tools = workers.context_agent.clone(tools=[security_tool, health_tool, workers.analyze_code_context])
         result = await Runner.run(context_with_tools, prompt)
+        result = result.final_output
         print("Received response from context agent")
                 
         return result
