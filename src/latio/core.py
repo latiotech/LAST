@@ -13,7 +13,10 @@ import google.generativeai as genai
 from IPython.display import display
 from IPython.display import Markdown
 import asyncio
-import workers
+try:
+    from . import workers
+except ImportError:
+    import workers
 
 def to_markdown(text):
     text = text.replace('•', '  *')
