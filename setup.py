@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='latio',
-    version='v1.2.2',
+    version='v1.2.3',
     url='https://github.com/latiotech/LAST',
     license='GPL-3.0 license',
     author='James Berthoty',
@@ -19,5 +19,20 @@ setup(
             'console_scripts': ['latio = latio.core:main'],
         },
     long_description=long_description,
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Security',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+    ],
+    python_requires='>=3.8',
+    package_dir={'': 'src'},
+    packages=['latio'],
+    include_package_data=True,
 )
