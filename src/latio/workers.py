@@ -15,15 +15,15 @@ def analyze_code_context(function_changes: List[str], changed_files: List[str]) 
     print("Changed files:", changed_files)
     file_contents = {}
     
-    # Get the absolute path of the workspace root
-    workspace_root = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    print("Workspace root:", workspace_root)
+    # Get the current working directory from the user's bash shell
+    workspace_root = os.getcwd()
     
     for file in changed_files:
         try:
+            # Strip out ./ prefix if present
+            clean_file = file.lstrip('./')
             # Construct absolute path for the file
-            file_path = os.path.join(workspace_root, file)
-            print(f"Attempting to read file: {file_path}")
+            file_path = os.path.join(workspace_root, clean_file)
             with open(file_path, 'r') as f:
                 file_contents[file] = f.read()
         except FileNotFoundError:
@@ -63,14 +63,16 @@ def gather_full_code(changed_files: List[str]):
     print("Analyzing files:", changed_files)
     file_contents = {}
     
-    # Get the absolute path of the workspace root
-    workspace_root = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    # Get the current working directory
+    workspace_root = os.getcwd()
     print("Workspace root:", workspace_root)
     
     for file in changed_files:
         try:
+            # Strip out ./ prefix if present
+            clean_file = file.lstrip('./')
             # Construct absolute path for the file
-            file_path = os.path.join(workspace_root, file)
+            file_path = os.path.join(workspace_root, clean_file)
             with open(file_path, 'r') as f:
                 # Read lines and add line numbers
                 print(f"Reading file: {file_path}")
@@ -144,11 +146,13 @@ full_context_agent_code = Agent(
 full_context_file_parser = Agent(
     name="Full Context Agent File Parser",
     handoff_description="Specialist in evaluating code for security and health issues.",
-    instructions=(
-    "You are a coding expert with a deep understanding of the codebase and the latest security and health best practices."
-    "You are going to receive a list of files, return only the ones that seem the most relevant for security or health analysis."
-    "Then, you will make sure to drop any files that seem they will be larger than your context window."
-    "You will then hand off the relevant files to the full context agent code gatherer to analyze the code."
+    instructions=("""
+    {RECOMMENDED_PROMPT_PREFIX}
+    You are a coding expert with a deep understanding of the codebase and the latest security and health best practices.
+    You are going to receive a list of files with number of characters, return only the ones that seem the most relevant for security or health analysis.
+    Then, you will make sure to drop any files that seem they will be larger than your context window, which is about 512,000 characters.
+    You will then hand off the relevant files to the full context agent code gatherer to analyze the code.
+    """
     ),
     handoffs=[full_context_agent_code],
 )

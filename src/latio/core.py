@@ -275,17 +275,126 @@ async def full_agent_scan(directory, model, health=False):
     """
     Scans files changed locally and includes detailed line changes for security issues.
     """
+    # Common patterns to ignore
+    ignore_patterns = {
+        'directories': [
+            'node_modules',
+            '.git',
+            '__pycache__',
+            '.pytest_cache',
+            'dist',
+            'build',
+            'venv',
+            '.venv',
+            'env',
+            '.env',
+            'target',
+            'out',
+            'coverage',
+            '.next',
+            '.nuxt',
+            '.output',
+            '.cache',
+            '.idea',
+            '.vscode',
+            '.DS_Store'
+        ],
+        'files': [
+            '*.pyc',
+            '*.pyo',
+            '*.pyd',
+            '*.so',
+            '*.dll',
+            '*.dylib',
+            '*.exe',
+            '*.class',
+            '*.jar',
+            '*.war',
+            '*.ear',
+            '*.zip',
+            '*.tar.gz',
+            '*.tar',
+            '*.gz',
+            '*.rar',
+            '*.7z',
+            '*.pdf',
+            '*.doc',
+            '*.docx',
+            '*.xls',
+            '*.xlsx',
+            '*.ppt',
+            '*.pptx',
+            '*.jpg',
+            '*.jpeg',
+            '*.png',
+            '*.gif',
+            '*.ico',
+            '*.svg',
+            '*.woff',
+            '*.woff2',
+            '*.ttf',
+            '*.eot',
+            '*.mp3',
+            '*.mp4',
+            '*.wav',
+            '*.ogg',
+            '*.webm',
+            '*.mov',
+            '*.avi',
+            '*.mkv',
+            '*.log',
+            '*.lock',
+            '*.min.js',
+            '*.min.css',
+            '*.bundle.js',
+            '*.bundle.css'
+        ]
+    }
+
+    def should_ignore(path):
+        # Check if path contains any ignored directory
+        for pattern in ignore_patterns['directories']:
+            if pattern in path.split(os.sep):
+                return True
+        
+        # Check if file matches any ignored pattern
+        for pattern in ignore_patterns['files']:
+            if path.endswith(pattern.replace('*', '')):
+                return True
+        
+        return False
+
     file_list = []
+    total_chars = 0
     for root, dirs, files in os.walk(directory):
+        # Remove ignored directories from dirs to prevent walking into them
+        dirs[:] = [d for d in dirs if not should_ignore(os.path.join(root, d))]
+        
         for file in files:
             file_path = os.path.join(root, file)
+            if should_ignore(file_path):
+                continue
+                
             try:
-                with open(file_path, 'r') as f:
-                    line_count = len(f.readlines())
-                file_list.append(f"{file_path} ({line_count} lines)")
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    char_count = len(content)
+                file_list.append(f"{file_path} ({char_count} chars)")
+                total_chars += char_count
+            except UnicodeDecodeError:
+                # Try with a different encoding if UTF-8 fails
+                try:
+                    with open(file_path, 'r', encoding='latin-1') as f:
+                        content = f.read()
+                        char_count = len(content)
+                    file_list.append(f"{file_path} ({char_count} chars)")
+                    total_chars += char_count
+                except Exception as e:
+                    file_list.append(f"{file_path} (error reading file: {str(e)})")
             except Exception as e:
                 file_list.append(f"{file_path} (error reading file: {str(e)})")
-    application_summary = "\n".join(file_list)
+    
+    application_summary = f"Total characters: {total_chars}\n\nFiles:\n" + "\n".join(file_list)
 
     prompt = "Here are all of the files in this application: " + application_summary
     try:
