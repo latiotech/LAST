@@ -297,7 +297,8 @@ async def full_agent_scan(directory, model, health=False):
             '.cache',
             '.idea',
             '.vscode',
-            '.DS_Store'
+            '.DS_Store',
+            '.gradle'
         ],
         'files': [
             '*.pyc',

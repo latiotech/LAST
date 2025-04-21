@@ -117,10 +117,11 @@ context_agent = Agent(
     "You will be given a list of files and lines of code that have been changed in a pull request. You will first find all relevant code and files related to the changes."
     "The analyze_code_context function takes in a list of function changes based on the line changes you're seeing, as well as their file paths, and returns a summary of the relevant code and files."
     "This will be a lot of information to process, so condense this information for the security and health agents: what the application is generally doing, what the files are doing in the context of the application, and what the function changes are doing in the context of the files."
-    "Then, based on the relevant code you find, you will hand off to the security agent or the health agent. It is essential that the original code changes "
+    "Then, based on the relevant code you find, you will hand off to the security agent or the health agent. It is essential that the original code changes are always passed to the security or health agent."
     "If there are potential security issues to investigate, handoff to the security agent."
     "If there are potential health issues to investigate, handoff to the health agent."
     "If there are no issues, return a message to the user that the pull request is good to go."
+    "ALWAYS HANDOFF TO THE SECURITY OR HEALTH AGENT WITH THE MOST RELEVANT CODE."
     ),
     handoffs=[security_agent, health_agent],
     tools=[analyze_code_context],
@@ -136,7 +137,7 @@ full_context_agent_code = Agent(
     This will be a lot of information to process, so condense this information for the security and health agents: what the application is generally doing, what the files are doing in the context of the application, and the specific lines of code that are most relevant for analysis."
     If there are potential security issues to investigate, handoff to the security agent with the most relevant code."
     If there are potential health issues to investigate, handoff to the health agent with the most relevant code."
-    If there are no issues, return a message to the user that the code has no issues."
+    ALWAYS HANDOFF TO THE SECURITY OR HEALTH AGENT WITH THE MOST RELEVANT CODE.
     """ 
     ),
     handoffs=[security_agent, health_agent],
@@ -151,7 +152,7 @@ full_context_file_parser = Agent(
     You are a coding expert with a deep understanding of the codebase and the latest security and health best practices.
     You are going to receive a list of files with number of characters, return only the ones that seem the most relevant for security or health analysis.
     Then, you will make sure to drop any files that seem they will be larger than your context window, which is about 512,000 characters.
-    You will then hand off the relevant files to the full context agent code gatherer to analyze the code.
+    Always handoff the relevant files to the full context agent code gatherer to analyze the code.
     """
     ),
     handoffs=[full_context_agent_code],
