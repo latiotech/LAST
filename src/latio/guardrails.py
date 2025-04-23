@@ -28,7 +28,7 @@ class PillarClient:
             raise PillarGuardrailMissingCredentials(msg)
 
         self.api_url = (
-            api_url or os.environ.get("PILLAR_API_URL") or "https://api.pillar.security"
+            api_url or os.environ.get("PILLAR_API_URL") or "https://api.pillar.security/api/v0/sessions"
         )
         self.client = httpx.AsyncClient(timeout=30.0)
 
