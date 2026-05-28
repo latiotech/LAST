@@ -1,0 +1,291 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: latiotech/last
+    source: https://github.com/latiotech/last
+    branch: main
+    commit: "901e631b"
+    scope: [src/latio/core.py, src/latio/workers.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:12:36Z'
+  signatures:
+    digest: sha256:dgp8_DpWjbGrq2b9LZN6p-mqsZPpnBDyfFL2cFKc1d4
+    key: ed25519:pAWInCO7gi7lDczx4CrT2N5uP_0VLW0jBjcNFugJXLk
+    sig: ed25519:y7oERaEXXfywMjoSaHBhkqUA4FsZmML6-OEKspufh6Ub5iDRZz4lr-gxZvzkIw7Ssxs_ZebrMIJ-mpIrDZkwAQ
+
+agents:
+  agent.analyze_code_context:
+    type: factory
+    models: [gpt-4.1]
+    params:
+      function: analyze_code_context
+      name: App Context Agent
+  context_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [analyze_code_context]
+    params:
+      name: Context Agent
+      handoff_description: Specialist in evaluating code for security and health issues.
+      handoffs: [security_agent, health_agent]
+      instructions: ['You are a coding expert with a deep understanding of the codebase and the latest security and health
+          best practices.You will be given a list of files and lines of code that have been changed in a pull request. You
+          will first find all relevant code and files related to the changes.The analyze_code_context function takes in a
+          list of function changes based on the line changes you''re seeing, as well as their file paths, and returns a summary
+          of the relevant code and files.This will be a lot of information to process, so condense this information for the
+          security and health agents: what the application is generally doing, what the files are doing in the context of
+          the application, and what the function changes are doing in the context of the files.Then, based on the relevant
+          code you find, you will hand off to the security agent or the health agent. It is essential that the original code
+          changes are always passed to the security or health agent.If there are potential security issues to investigate,
+          handoff to the security agent.If there are potential health issues to investigate, handoff to the health agent.If
+          there are no issues, return a message to the user that the pull request is good to go.ALWAYS HANDOFF TO THE SECURITY
+          OR HEALTH AGENT WITH THE MOST RELEVANT CODE.']
+  full_context_agent_code:
+    type: instance
+    models: [gpt-4.1]
+    tools: [gather_full_code]
+    params:
+      name: Full Context Agent Code Gatherer
+      handoff_description: Specialist in evaluating code for security and health issues.
+      handoffs: [security_agent, health_agent]
+      instructions: ['{RECOMMENDED_PROMPT_PREFIX}', You are a coding expert with a deep understanding of the codebase and
+          the latest security and health best practices.", You will be given a list of files for analysis. You will first
+          fetch all of the code for these files using the analyze_code_context function.", 'This will be a lot of information
+          to process, so condense this information for the security and health agents: what the application is generally doing,
+          what the files are doing in the context of the application, and the specific lines of code that are most relevant
+          for analysis."', 'If there are potential security issues to investigate, handoff to the security agent with the
+          most relevant code."', 'If there are potential health issues to investigate, handoff to the health agent with the
+          most relevant code."', ALWAYS HANDOFF TO THE SECURITY OR HEALTH AGENT WITH THE MOST RELEVANT CODE.]
+  full_context_file_parser:
+    type: instance
+    models: [gpt-4.1]
+    params:
+      name: Full Context Agent File Parser
+      handoff_description: Specialist in evaluating code for security and health issues.
+      handoffs: [full_context_agent_code]
+      instructions: ['{RECOMMENDED_PROMPT_PREFIX}', You are a coding expert with a deep understanding of the codebase and
+          the latest security and health best practices., 'You are going to receive a list of files with number of characters,
+          return only the ones that seem the most relevant for security or health analysis.', 'Then, you will make sure to
+          drop any files that seem they will be larger than your context window, which is about 512,000 characters.', Always
+          handoff the relevant files to the full context agent code gatherer to analyze the code.]
+  health_agent:
+    type: instance
+    models: [gpt-4.1]
+    params:
+      name: Health Agent
+      handoff_description: Specialist in evaluating code for health issues.
+      instructions: ['You are a 10x developer with a deep understanding of the codebase and the latest health best practices.You
+          will be given a list of files and code snippets to evaluate for health issues, as well as additional context about
+          the codebase    .Give the user a short summary of the health issues you found, the files they were found in, the
+          lines of code that are affected, and some fix guidance with an example.']
+  security_agent:
+    type: instance
+    models: [gpt-4.1]
+    params:
+      name: Security Agent
+      handoff_description: Specialist in evaluating code for security issues.
+      instructions: ['{RECOMMENDED_PROMPT_PREFIX}', You are a super friendly security expert with a deep understanding of
+          the codebase and the latest security best practices., 'You will be given a list of files and code snippets to evaluate
+          for security issues, as well as additional context about the codebase.', 'Give the user a short summary of the security
+          issues you found, the files they were found in, the lines of code that are affected, and some fix guidance with
+          an example specific to the user''s code.']
+
+models:
+  gpt-4.1:
+    type: default
+    agents: [agent.analyze_code_context, security_agent, health_agent, context_agent, full_context_agent_code, full_context_file_parser]
+
+tools:
+  analyze_code_context:
+    type: decorator
+    agents: [context_agent]
+    params:
+      description: Takes in a list of files and line changes and returns any relevant file details and application context.
+  full_context_code_gatherer:
+    type: agent
+    params:
+      alias: workers.full_context_agent_code.as_tool
+      tool_name: full_context_agent_code
+      tool_description: Specialist in evaluating code for security and health issues.
+      source_agent: workers.full_context_agent_code
+  gather_full_code:
+    type: decorator
+    agents: [full_context_agent_code]
+    params:
+      description: |-
+        Takes in a list of files and line changes and returns any relevant file details and application context.
+        Each line in the returned file contents will be prefixed with its line number.
+  health_tool:
+    type: agent
+    params:
+      alias: workers.health_agent.as_tool
+      tool_name: health_agent
+      tool_description: Specialist in evaluating code for health issues.
+      source_agent: workers.health_agent
+  security_tool:
+    type: agent
+    params:
+      alias: workers.security_agent.as_tool
+      tool_name: security_agent
+      tool_description: Specialist in evaluating code for security issues.
+      source_agent: workers.security_agent
+
+teams:
+  context_agent:
+    type: handoff
+    agents: [context_agent, security_agent, health_agent]
+  full_context_agent_code:
+    type: handoff
+    agents: [full_context_agent_code, security_agent, health_agent]
+  full_context_file_parser:
+    type: handoff
+    agents: [full_context_file_parser, full_context_agent_code]
+
+imports:
+  Agent: agents.Agent
+  argparse: argparse
+  asyncio: asyncio
+  BaseModel: pydantic.BaseModel
+  Dict: typing.Dict
+  display: IPython.display.display
+  draw_graph: agents.extensions.visualization.draw_graph
+  function_tool: agents.function_tool
+  genai: google.generativeai
+  Github: github.Github
+  handoff_filters: agents.extensions.handoff_filters
+  List: typing.List
+  main: core.main
+  Markdown: IPython.display.Markdown
+  OpenAI: openai.OpenAI
+  os: os
+  pathlib: pathlib
+  RECOMMENDED_PROMPT_PREFIX: agents.extensions.handoff_prompt.RECOMMENDED_PROMPT_PREFIX
+  requests: requests
+  Runner: agents.Runner
+  Set: typing.Set
+  subprocess: subprocess
+  sys: sys
+  textwrap: textwrap
+  traceback: traceback
+  workers: workers
+
+functions:
+  analyze_code_context:
+    type: tool
+    module: src.latio.workers
+    args: [function_changes, changed_files]
+    params:
+      returns: dict
+  color_diff_line:
+    type: sync
+    module: src.latio.core
+    args: [line]
+  color_text:
+    type: sync
+    module: src.latio.core
+    args: [text, color_code]
+  full_agent_scan:
+    type: async
+    module: src.latio.core
+    args: [directory, model, health]
+  full_health_scan:
+    type: sync
+    module: src.latio.core
+    args: [application_summary, model]
+  full_scan:
+    type: sync
+    module: src.latio.core
+    args: [directory, model, health]
+  full_sec_scan:
+    type: sync
+    module: src.latio.core
+    args: [application_summary, model]
+  gather_full_code:
+    type: tool
+    module: src.latio.workers
+    args: [changed_files]
+  get_changed_files:
+    type: sync
+    module: src.latio.core
+    args: [directory]
+  get_changed_files_github:
+    type: sync
+    module: src.latio.core
+    args: [directory, base_ref, head_ref]
+  get_line_changes:
+    type: sync
+    module: src.latio.core
+    args: [directory, changed_files]
+  github_scan:
+    type: sync
+    module: src.latio.core
+    args: [repo_name, pr_number, github_token, model, health]
+  main:
+    type: sync
+    module: src.latio.core
+  partial_agent_scan:
+    type: async
+    module: src.latio.core
+    args: [directory, model, health]
+  partial_health_scan:
+    type: sync
+    module: src.latio.core
+    args: [application_summary, model]
+  partial_scan:
+    type: sync
+    module: src.latio.core
+    args: [directory, model, health]
+  partial_scan_github:
+    type: sync
+    module: src.latio.core
+    args: [directory, base_ref, head_ref, model, health]
+  partial_sec_scan:
+    type: sync
+    module: src.latio.core
+    args: [application_summary, model]
+  should_ignore:
+    type: sync
+    module: src.latio.core
+    args: [path]
+  to_markdown:
+    type: sync
+    module: src.latio.core
+    args: [text]
+
+variables:
+  GEMINI_API_KEY:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.latio.core]
+  GITHUB_TOKEN:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.latio.core]
+  OPENAI_API_KEY:
+    type: env
+    params:
+      caller: [os.environ.get, OpenAI]
+      path: [src.latio.core]
+
+files:
+  file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+
+processes:
+  git:
+    type: shell
+    actions: [exec]
+    args: [[diff, --name-status, '{base_ref}...{head_ref}'], [rev-parse, --is-inside-work-tree], [diff, --name-only], [diff,
+        --staged, --name-only], [ls-files, --others, --exclude-standard], [diff, --, file], [diff, --staged, --, file], [
+        ls-files, --others, --exclude-standard]]
+    params:
+      caller: [subprocess.check_output]
+      shell: ["False", "False", "False", "False", "False", "False", "False", "False"]
