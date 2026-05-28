@@ -213,6 +213,8 @@ def full_sec_scan(application_summary, model):
                 max_tokens=1000,
                 temperature=0.7,
             )
+            if not response.choices or response.choices[0].message is None:
+                raise ValueError("LLM returned empty or filtered response")
             message = response.choices[0].message.content.strip()
             return message
         except Exception as e:
@@ -241,6 +243,8 @@ def full_health_scan(application_summary, model):
                 max_tokens=1000,
                 temperature=0.7,
             )
+            if not response.choices or response.choices[0].message is None:
+                raise ValueError("LLM returned empty or filtered response")
             message = response.choices[0].message.content.strip()
             return message
         except Exception as e:
@@ -450,6 +454,8 @@ def partial_sec_scan(application_summary, model):
                 max_tokens=1000,
                 temperature=0.7,
             )
+            if not response.choices or response.choices[0].message is None:
+                raise ValueError("LLM returned empty or filtered response")
             message = response.choices[0].message.content.strip()
             return message
         except Exception as e:
@@ -478,6 +484,8 @@ def partial_health_scan(application_summary, model):
                 max_tokens=1000,
                 temperature=0.7,
             )
+            if not response.choices or response.choices[0].message is None:
+                raise ValueError("LLM returned empty or filtered response")
             message = response.choices[0].message.content.strip()
             return message
         except Exception as e:
